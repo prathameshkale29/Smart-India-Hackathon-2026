@@ -547,12 +547,12 @@ export const ML_MODEL_METRICS = {
 };
 
 export const PROJECT_METADATA = {
-  title: "JalDrishti (जलदृष्टि) AI",
+  title: "VATAVARAN (वातावरण) AI",
   subtitle: "AI-Powered Micro-Level Rainfall & Flash Flood Early Warning System",
   district: "Wardha District, Maharashtra, India",
   hackathon: "Smart India Hackathon 2026",
   problemStatement: "SIH-2026-ENV-1042 — High-Resolution Localized Precipitation & Flash Flood Early Warning System",
-  teamName: "Team HydroByte",
+  teamName: "Team Vatavaran",
   category: "Final Year B.Tech Capstone / AI for Disaster Management",
   college: "Dept. of Computer Science & Engineering",
   version: "v1.4-beta (Student Prototype)",

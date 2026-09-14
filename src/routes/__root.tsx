@@ -73,17 +73,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "JalDrishti AI | Smart India Hackathon 2026 Prototype" },
+      { title: "VATAVARAN AI | Smart India Hackathon 2026 Prototype" },
       {
         name: "description",
         content:
-          "AI-Driven Wardha District Rainfall Analytics & Flood Early Warning System — Final Year Engineering Capstone Prototype (SIH 2026).",
+          "VATAVARAN: AI-Driven Wardha District Rainfall Analytics & Flood Early Warning System — Final Year Engineering Capstone Prototype (SIH 2026).",
       },
-      { name: "author", content: "Team HydroByte — SIH 2026" },
-      { property: "og:title", content: "JalDrishti AI — SIH 2026 Rainfall & Flood Warning Prototype" },
+      { name: "author", content: "Team Vatavaran — SIH 2026" },
+      { property: "og:title", content: "VATAVARAN AI — SIH 2026 Rainfall & Flood Warning Prototype" },
       {
         property: "og:description",
-        content: "High-resolution Wardha rainfall analytics, LSTM prediction sandbox, and flash flood risk assessment prototype.",
+        content: "VATAVARAN: High-resolution Wardha rainfall analytics, LSTM prediction sandbox, and flash flood risk assessment prototype.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
