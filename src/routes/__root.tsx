@@ -73,17 +73,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "National Meteorological Department" },
+      { title: "JalDrishti AI | Smart India Hackathon 2026 Prototype" },
       {
         name: "description",
         content:
-          "Official portal of the National Meteorological Department: warnings, nowcasts, satellite and radar products, and daily weather bulletins.",
+          "AI-Driven Wardha District Rainfall Analytics & Flood Early Warning System — Final Year Engineering Capstone Prototype (SIH 2026).",
       },
-      { name: "author", content: "National Meteorological Department" },
-      { property: "og:title", content: "National Meteorological Department" },
+      { name: "author", content: "Team HydroByte — SIH 2026" },
+      { property: "og:title", content: "JalDrishti AI — SIH 2026 Rainfall & Flood Warning Prototype" },
       {
         property: "og:description",
-        content: "Warnings, nowcasts, satellite and radar products, and daily weather bulletins.",
+        content: "High-resolution Wardha rainfall analytics, LSTM prediction sandbox, and flash flood risk assessment prototype.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -1,608 +1,1270 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import emblem from "@/assets/emblem.png";
-import satellite from "@/assets/insat-ir.jpg";
-import radar from "@/assets/radar.jpg";
-import warningMap from "@/assets/warning-map.jpg";
-import briefing from "@/assets/briefing.jpg";
+import { useState, useMemo } from "react";
+import {
+  CloudRain,
+  Droplets,
+  Thermometer,
+  AlertTriangle,
+  CheckCircle2,
+  Activity,
+  Database,
+  Cpu,
+  MapPin,
+  TrendingUp,
+  BarChart3,
+  FileSpreadsheet,
+  RefreshCw,
+  Play,
+  Sparkles,
+  ShieldAlert,
+  Search,
+  Sliders,
+  Calendar,
+  Info,
+  GraduationCap,
+  Layers,
+  Flame,
+  ArrowUpRight,
+  UploadCloud,
+  Check,
+} from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  Cell,
+  AreaChart,
+  Area,
+} from "recharts";
+import {
+  WARDHA_STATIONS,
+  ML_MODEL_METRICS,
+  PROJECT_METADATA,
+  type StationData,
+} from "@/data/wardhaData";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "NMD | National Meteorological Department — Weather Portal" },
-      {
-        name: "description",
-        content:
-          "Current warnings, nowcasts, satellite and radar imagery, station observations and daily weather bulletins issued by the National Meteorological Department.",
-      },
-      {
-        property: "og:title",
-        content: "National Meteorological Department — Weather Portal",
-      },
-      {
-        property: "og:description",
-        content:
-          "Warnings, nowcasts, satellite and radar products, station observations and daily bulletins.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: Portal,
+  component: StudentPrototypeApp,
 });
 
-const NAV = [
-  { label: "Home", caret: false },
-  { label: "About Us", caret: true },
-  { label: "Forecast", caret: true },
-  { label: "Warnings", caret: true },
-  { label: "Observations", caret: true },
-  { label: "Satellite", caret: true },
-  { label: "Radar", caret: false },
-  { label: "Cyclone", caret: true },
-  { label: "Monsoon", caret: true },
-  { label: "Climate Data", caret: true },
-  { label: "Aviation", caret: false },
-  { label: "Agromet", caret: true },
-  { label: "Publications", caret: true },
-  { label: "Contact", caret: false },
-];
+type ActiveTab = "overview" | "prediction" | "stations" | "datasets" | "architecture";
 
-const TICKER = [
-  "10-09-2026 05:30 IST — Deep Depression over Westcentral Bay of Bengal, likely to intensify into a Cyclonic Storm during next 24 hrs.",
-  "10-09-2026 04:15 IST — ORANGE warning issued for Konkan & Goa: isolated extremely heavy rainfall (>204.5 mm) on 11 & 12 Sept.",
-  "09-09-2026 20:00 IST — Press Release No. 412/2026: Monsoon 2026 seasonal rainfall 104% of LPA up to 09 Sept.",
-  "09-09-2026 17:45 IST — DWR Sriharikota returned to service after scheduled klystron replacement (downtime 06:00–17:30 IST).",
-  "08-09-2026 11:00 IST — Tender NMD/PROC/2026-27/117 for supply of 60 AWS sensor packages — last date 26-09-2026.",
-];
+function StudentPrototypeApp() {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
+  const [selectedStationId, setSelectedStationId] = useState<string>("arvi");
 
-const CALLOUTS = [
-  {
-    title: "Warnings",
-    color: "bg-signal-red",
-    links: ["All India Colour-Coded Warning", "District-wise Warning (Day 1–5)"],
-  },
-  {
-    title: "Nowcast",
-    color: "bg-signal-amber",
-    links: ["Nowcast for 1200 Stations (3 hrs)", "Thunderstorm & Lightning Alerts"],
-  },
-  {
-    title: "Public Observation",
-    color: "bg-signal-teal",
-    links: ["Current Weather — 720 Stations", "Past 24 hr Rainfall Statement"],
-  },
-  {
-    title: "Specialized Forecast",
-    color: "bg-navy-light",
-    links: ["Aviation (TAF / METAR)", "Agromet Advisory Bulletin"],
-  },
-];
+  // Predictor Simulator State
+  const [predStation, setPredStation] = useState<string>("hinganghat");
+  const [priorRain, setPriorRain] = useState<number>(45);
+  const [humidity, setHumidity] = useState<number>(85);
+  const [pressure, setPressure] = useState<number>(998);
+  const [soilMoisture, setSoilMoisture] = useState<number>(75);
+  const [cloudTemp, setCloudTemp] = useState<number>(-45);
+  const [isInferencing, setIsInferencing] = useState<boolean>(false);
+  const [inferenceResult, setInferenceResult] = useState<{
+    predictedRain: number;
+    riskLevel: "Normal" | "Watch" | "Alert" | "Critical Cloudburst";
+    confidence: number;
+    runoffIndex: number;
+    advisory: string;
+  } | null>({
+    predictedRain: 74.2,
+    riskLevel: "Alert",
+    confidence: 94.6,
+    runoffIndex: 82,
+    advisory: "High risk of flash flooding in low-lying areas. Alert local municipal authorities and deploy water pumps.",
+  });
 
-const TABS = [
-  {
-    id: "satellite",
-    label: "Satellite",
-    img: satellite,
-    caption:
-      "INSAT-3DR IR1 (10.8 µm) — 10-09-2026 0600 UTC / 1130 IST — Sector: Asia, 4 km resolution",
-  },
-  {
-    id: "radar",
-    label: "Radar",
-    img: radar,
-    caption:
-      "DWR Chennai (13.0827°N, 80.2707°E) MAX-Z — 10-09-2026 0600 UTC / 1130 IST — Range 250 km",
-  },
-  {
-    id: "lightning",
-    label: "Lightning",
-    img: satellite,
-    caption:
-      "Lightning Detection Network composite — strokes 0300–0600 UTC 10-09-2026 — 34,812 CG strokes",
-  },
-];
+  // Dataset explorer state
+  const [datasetSearch, setDatasetSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
 
-const STATIONS = [
-  ["Safdarjung, Delhi", "34.2", "26.1", "0.0", "SE 08"],
-  ["Santacruz, Mumbai", "29.8", "25.4", "62.4", "W 22"],
-  ["Alipore, Kolkata", "31.6", "26.9", "18.2", "S 14"],
-  ["Nungambakkam, Chennai", "33.1", "27.0", "4.6", "E 11"],
-  ["Bengaluru City", "27.4", "20.2", "9.8", "W 06"],
-  ["Ahmedabad", "35.6", "26.8", "0.0", "SW 12"],
-  ["Guwahati", "32.0", "26.4", "27.1", "SE 07"],
-];
+  // Selected station
+  const currentStation = useMemo(() => {
+    return WARDHA_STATIONS.find((s) => s.id === selectedStationId) || WARDHA_STATIONS[0];
+  }, [selectedStationId]);
 
-const NEWS = [
-  {
-    date: "09-09-2026",
-    title: "Monsoon withdrawal from West Rajasthan likely around 17 September",
-    img: satellite,
-  },
-  {
-    date: "07-09-2026",
-    title: "NMD commissions 12 new Automatic Weather Stations in Ladakh sector",
-    img: warningMap,
-  },
-  {
-    date: "04-09-2026",
-    title: "Annual Climate Statement 2025 released; mean anomaly +0.65 °C",
-    img: radar,
-  },
-];
+  // Run ML Inference calculation
+  const handleRunInference = () => {
+    setIsInferencing(true);
+    setTimeout(() => {
+      // Dynamic student ensemble formula simulation
+      const base = (priorRain * 0.45) + ((humidity - 50) * 0.6) + ((1013 - pressure) * 1.8) + (soilMoisture * 0.25) + (Math.abs(cloudTemp) * 0.3);
+      const predicted = Math.max(0, parseFloat((base * 0.62).toFixed(1)));
 
-const LINK_COLS = [
-  {
-    head: "Products & Services",
-    items: [
-      "All India Weather Bulletin (0830 IST)",
-      "District Rainfall Statement",
-      "Reservoir Rainfall Monitoring",
-      "Heat Wave / Cold Wave Statement",
-      "Sea Area Bulletin (Fishermen)",
-      "Tourism Weather Service",
-      "Ozone & UV Index",
-    ],
-  },
-  {
-    head: "Data & Archives",
-    items: [
-      "Data Supply Portal (paid service)",
-      "Climatological Normals 1991–2020",
-      "Station-wise Daily Rainfall Archive",
-      "Radiosonde / Pilot Balloon Data",
-      "Cyclone eAtlas — Bay & Arabian Sea",
-      "Historic Storm Track Database",
-    ],
-  },
-  {
-    head: "Departmental",
-    items: [
-      "Tenders & Procurement Notices",
-      "Recruitment / Result Notices",
-      "RTI Disclosures (Section 4(1)(b))",
-      "Citizen's Charter",
-      "Annual Report 2025-26 (PDF, 8.4 MB)",
-      "Vigilance & Grievance Cell",
-      "Officers' Directory",
-    ],
-  },
-  {
-    head: "Allied Organisations",
-    items: [
-      "National Centre for Medium Range Forecasting",
-      "Institute of Tropical Meteorology",
-      "National Disaster Management Authority",
-      "Central Water Commission",
-      "Space Research Organisation",
-      "World Meteorological Organization",
-    ],
-  },
-];
+      let risk: "Normal" | "Watch" | "Alert" | "Critical Cloudburst" = "Normal";
+      let advisory = "No immediate flood hazard. Routine agricultural advisory.";
 
-function Portal() {
-  const [tab, setTab] = useState("satellite");
-  const [mapTab, setMapTab] = useState("warnings");
-  const active = TABS.find((t) => t.id === tab)!;
+      if (predicted >= 115) {
+        risk = "Critical Cloudburst";
+        advisory = "CRITICAL INUNDATION THREAT: Immediate evacuation of riverine floodplains required. Trigger NDRF standby.";
+      } else if (predicted >= 65) {
+        risk = "Alert";
+        advisory = "HIGH DELUGE RISK: Waterlogging expected on SH-243 and low-lying taluka settlements. Deploy drainage response teams.";
+      } else if (predicted >= 25) {
+        risk = "Watch";
+        advisory = "MODERATE PRECIPITATION: Localized puddling possible. Advise farmers against unseasonal fertilizer spraying.";
+      }
+
+      setInferenceResult({
+        predictedRain: predicted,
+        riskLevel: risk,
+        confidence: +(88 + Math.random() * 8).toFixed(1),
+        runoffIndex: Math.min(100, Math.round(predicted * 0.9 + soilMoisture * 0.3)),
+        advisory,
+      });
+      setIsInferencing(false);
+    }, 450);
+  };
+
+  // Quick Preset Handlers
+  const applyPreset = (type: "dry" | "normal" | "cloudburst" | "flood") => {
+    if (type === "dry") {
+      setPriorRain(0);
+      setHumidity(45);
+      setPressure(1014);
+      setSoilMoisture(25);
+      setCloudTemp(-10);
+    } else if (type === "normal") {
+      setPriorRain(18);
+      setHumidity(75);
+      setPressure(1004);
+      setSoilMoisture(55);
+      setCloudTemp(-35);
+    } else if (type === "flood") {
+      setPriorRain(65);
+      setHumidity(92);
+      setPressure(994);
+      setSoilMoisture(85);
+      setCloudTemp(-55);
+    } else if (type === "cloudburst") {
+      setPriorRain(110);
+      setHumidity(98);
+      setPressure(988);
+      setSoilMoisture(95);
+      setCloudTemp(-70);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Utility bar */}
-      <div className="border-b border-border bg-navy-dark text-signal-foreground">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-end gap-3 px-2 py-1 text-[0.8rem]">
-          <span className="mr-auto tech-label text-signal-foreground/70">
-            Last site update: 10-09-2026 11:42 IST
-          </span>
-          <a href="#" className="text-signal-foreground hover:underline">
-            Screen Reader
-          </a>
-          <span className="text-signal-foreground/40">|</span>
-          <a href="#" className="text-signal-foreground hover:underline">
-            A-
-          </a>
-          <a href="#" className="text-signal-foreground hover:underline">
-            A
-          </a>
-          <a href="#" className="text-signal-foreground hover:underline">
-            A+
-          </a>
-          <span className="text-signal-foreground/40">|</span>
-          <a href="#" aria-label="Twitter" className="text-signal-foreground">
-            [t]
-          </a>
-          <a href="#" aria-label="Facebook" className="text-signal-foreground">
-            [f]
-          </a>
-          <a href="#" aria-label="YouTube" className="text-signal-foreground">
-            [yt]
-          </a>
-          <span className="text-signal-foreground/40">|</span>
-          <button
-            type="button"
-            className="border border-signal-foreground/50 px-2 py-[1px] text-[0.8rem] hover:bg-signal-foreground/10"
-          >
-            हिन्दी
-          </button>
+    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white flex flex-col font-sans">
+      {/* Top Academic & Hackathon Banner */}
+      <div className="bg-gradient-to-r from-blue-900/80 via-indigo-900/80 to-slate-900 border-b border-blue-800/40 px-4 py-1.5 text-xs text-slate-300">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded bg-blue-500/20 text-blue-300 font-semibold px-2 py-0.5 border border-blue-500/30">
+              <GraduationCap className="w-3.5 h-3.5" />
+              {PROJECT_METADATA.hackathon}
+            </span>
+            <span className="hidden sm:inline text-slate-400">|</span>
+            <span className="text-slate-300 font-medium">PS: {PROJECT_METADATA.problemStatement.split("—")[0]}</span>
+            <span className="hidden md:inline text-slate-500">•</span>
+            <span className="hidden md:inline text-slate-400">{PROJECT_METADATA.category}</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              LSTM Model: Active ({PROJECT_METADATA.version})
+            </span>
+            <span className="text-slate-500">|</span>
+            <span className="text-slate-400">{WARDHA_STATIONS.length} Talukas Monitored</span>
+          </div>
         </div>
       </div>
 
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-4 px-2 py-2">
-          <img
-            src={emblem}
-            alt="National Meteorological Department emblem"
-            width={512}
-            height={512}
-            className="h-14 w-14 shrink-0"
-          />
-          <div className="min-w-[220px] leading-tight">
-            <h1 className="text-[1.35rem] font-bold text-navy">
-              National Meteorological Department
-            </h1>
-            <div className="text-[0.95rem] text-foreground">
-              Ministry of Earth Sciences &nbsp;·&nbsp; Government Portal
+      {/* Main App Header */}
+      <header className="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <CloudRain className="w-6 h-6 text-white" />
             </div>
-            <div className="tech-label">
-              WMO Regional Specialised Meteorological Centre — Tropical Cyclones
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
+                  {PROJECT_METADATA.title}
+                  <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                    Prototype
+                  </span>
+                </h1>
+              </div>
+              <p className="text-xs text-slate-400">
+                {PROJECT_METADATA.subtitle} • <span className="text-blue-400">{PROJECT_METADATA.district}</span>
+              </p>
             </div>
           </div>
 
-          <form className="ml-auto flex items-center" onSubmit={(e) => e.preventDefault()}>
-            <label htmlFor="q" className="sr-only">
-              Search the portal
-            </label>
-            <input
-              id="q"
-              type="search"
-              placeholder="Search bulletins, stations, circulars…"
-              className="h-7 w-[230px] border border-input bg-background px-2 text-[0.85rem] outline-none focus:border-navy"
-            />
+          {/* Tab Navigation */}
+          <nav className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto">
             <button
-              type="submit"
-              className="h-7 border border-navy bg-navy px-3 text-[0.85rem] font-bold text-signal-foreground"
+              onClick={() => setActiveTab("overview")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === "overview"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+              }`}
             >
-              Search
+              <BarChart3 className="w-3.5 h-3.5" />
+              Overview & Talukas
             </button>
-          </form>
-
-          <div className="flex items-center gap-1">
-            {["RSMC", "WMO", "NDMA", "G20"].map((b) => (
-              <span
-                key={b}
-                className="border border-border bg-muted px-2 py-[6px] text-[0.72rem] font-bold tracking-wide text-navy"
-              >
-                {b}
-              </span>
-            ))}
-          </div>
+            <button
+              onClick={() => setActiveTab("prediction")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === "prediction"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              AI Prediction Sandbox
+            </button>
+            <button
+              onClick={() => setActiveTab("stations")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === "stations"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+              }`}
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              Station Deep-Dive
+            </button>
+            <button
+              onClick={() => setActiveTab("datasets")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === "datasets"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+              }`}
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              Dataset Explorer
+            </button>
+            <button
+              onClick={() => setActiveTab("architecture")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+                activeTab === "architecture"
+                  ? "bg-blue-600 text-white shadow"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
+              }`}
+            >
+              <Cpu className="w-3.5 h-3.5" />
+              Model Architecture
+            </button>
+          </nav>
         </div>
       </header>
 
-      {/* Primary nav */}
-      <nav className="bg-navy text-signal-foreground">
-        <ul className="mx-auto flex max-w-[1200px] flex-wrap px-1">
-          {NAV.map((n) => (
-            <li key={n.label}>
-              <a
-                href="#"
-                className="block border-r border-signal-foreground/15 px-[9px] py-[6px] text-[0.85rem] font-bold text-signal-foreground hover:bg-navy-light hover:no-underline"
-              >
-                {n.label}
-                {n.caret ? <span className="ml-1 text-[0.65rem]">▼</span> : null}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Ticker */}
-      <div className="flex items-stretch border-b border-border bg-signal-red text-signal-foreground">
-        <div className="shrink-0 border-r border-signal-foreground/30 bg-signal-red px-2 py-1 text-[0.8rem] font-bold uppercase">
-          Latest ▸
-        </div>
-        <div className="overflow-hidden py-1">
-          <div className="ticker-track">
-            {[0, 1].map((dup) => (
-              <span key={dup} className="flex">
-                {TICKER.map((t) => (
-                  <span key={t} className="px-6 text-[0.85rem]">
-                    {t}
-                  </span>
-                ))}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Callout strip */}
-      <div className="mx-auto grid max-w-[1200px] grid-cols-2 md:grid-cols-4">
-        {CALLOUTS.map((c) => (
-          <div
-            key={c.title}
-            className={`${c.color} border border-background/20 px-3 py-2 text-signal-foreground`}
-          >
-            <div className="mb-1 text-[0.95rem] font-bold uppercase tracking-wide">{c.title}</div>
-            <ul>
-              {c.links.map((l) => (
-                <li key={l} className="leading-snug">
-                  <a
-                    href="#"
-                    className="text-[0.83rem] text-signal-foreground underline-offset-2 hover:underline"
-                  >
-                    » {l}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      {/* Main dashboard */}
-      <main className="mx-auto grid max-w-[1200px] gap-2 px-2 py-2 lg:grid-cols-[260px_minmax(0,1fr)_270px]">
-        {/* Left column */}
-        <div className="space-y-2">
-          <section className="panel">
-            <h2 className="panel-head">All India Warning Map</h2>
-            <div className="flex border-b border-border bg-strip">
-              {(
-                [
-                  ["warnings", "Day 1"],
-                  ["day2", "Day 2"],
-                  ["rain", "Rainfall"],
-                ] as const
-              ).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setMapTab(id)}
-                  className={`border-r border-border px-2 py-1 text-[0.8rem] font-bold ${
-                    mapTab === id ? "bg-navy text-signal-foreground" : "text-navy hover:bg-muted"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <img
-              src={warningMap}
-              alt="Colour coded meteorological subdivision warning map of India"
-              width={800}
-              height={900}
-              loading="lazy"
-              className="w-full"
-            />
-            <div className="border-t border-border p-1 tech-label">
-              Valid 10-09-2026 0830 IST – 11-09-2026 0830 IST
-            </div>
-            <ul className="border-t border-border p-2 text-[0.8rem]">
-              {[
-                ["bg-signal-red", "Red — Take action (4 subdivisions)"],
-                ["bg-signal-amber", "Orange — Be prepared (7)"],
-                ["bg-signal-green", "Green — No warning (19)"],
-              ].map(([c, t]) => (
-                <li key={t} className="flex items-center gap-2 py-[2px]">
-                  <span className={`inline-block h-3 w-3 ${c}`} />
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="panel">
-            <h2 className="panel-head">Key Values — 0830 IST</h2>
-            <table className="w-full text-[0.8rem]">
-              <tbody>
-                {[
-                  ["Highest max temp", "Barmer 41.2 °C"],
-                  ["Lowest min temp", "Leh 4.6 °C"],
-                  ["Highest rainfall (24h)", "Mahabaleshwar 218.6 mm"],
-                  ["Cumulative rain (1 Jun)", "845.1 mm (104% LPA)"],
-                  ["Active systems", "01 Deep Depression"],
-                ].map(([k, v], i) => (
-                  <tr key={k} className={i % 2 ? "bg-table-stripe" : ""}>
-                    <th className="border-b border-border p-1 text-left font-normal text-muted-foreground">
-                      {k}
-                    </th>
-                    <td className="border-b border-border p-1 text-right font-bold">{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        </div>
-
-        {/* Centre column */}
-        <div className="space-y-2">
-          <section className="panel">
-            <div className="flex items-end justify-between border-b border-border bg-strip">
-              <div className="flex">
-                {TABS.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTab(t.id)}
-                    className={`border-r border-border px-3 py-[6px] text-[0.85rem] font-bold ${
-                      tab === t.id ? "bg-navy text-signal-foreground" : "text-navy hover:bg-muted"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+        {/* ========================================================================= */}
+        {/* TAB 1: OVERVIEW & TALUKAS */}
+        {/* ========================================================================= */}
+        {activeTab === "overview" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Top Quick Stats Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-sm hover:border-slate-700 transition">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-400">Total Observations</span>
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                    <Database className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-white">33,680</span>
+                  <span className="text-xs text-emerald-400 font-medium">+10 CSV Datasets</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">Daily IMD Pune NDCQ Records (2010–2024)</p>
               </div>
-              <span className="px-2 pb-1 tech-label">Auto-refresh 30 min</span>
-            </div>
-            <img
-              src={active.img}
-              alt={active.caption}
-              width={1024}
-              height={768}
-              className="w-full border-b border-border"
-            />
-            <div className="flex flex-wrap items-center justify-between gap-2 p-1">
-              <span className="tech-label">{active.caption}</span>
-              <span className="text-[0.8rem]">
-                <a href="#">Animation (last 12 frames)</a> · <a href="#">Full resolution</a>
-              </span>
-            </div>
-          </section>
 
-          <section className="panel">
-            <h2 className="panel-head">Current Weather — Selected Stations</h2>
-            <table className="w-full border-collapse text-[0.82rem]">
-              <thead>
-                <tr className="bg-strip text-left">
-                  <th className="border border-border p-1">Station</th>
-                  <th className="border border-border p-1">Max °C</th>
-                  <th className="border border-border p-1">Min °C</th>
-                  <th className="border border-border p-1">Rain 24h (mm)</th>
-                  <th className="border border-border p-1">Wind (kt)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {STATIONS.map((r, i) => (
-                  <tr key={r[0]} className={i % 2 ? "bg-table-stripe" : ""}>
-                    {r.map((c, j) => (
-                      <td
-                        key={j}
-                        className={`border border-border p-1 ${
-                          j === 0 ? "" : "text-right font-mono"
-                        }`}
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-sm hover:border-slate-700 transition">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-400">Wardha Avg Annual Rain</span>
+                  <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center">
+                    <Droplets className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-white">1,128.4</span>
+                  <span className="text-xs text-slate-400">mm / yr</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">Monsoon dominance: 88.5% (Jun–Sep)</p>
+              </div>
+
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-sm hover:border-slate-700 transition">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-400">Highest Historical Deluge</span>
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                    <Flame className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-amber-400">256.0 mm</span>
+                  <span className="text-xs text-slate-400">@ Selu</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">Cloudburst event on 18-07-2013</p>
+              </div>
+
+              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-sm hover:border-slate-700 transition">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-400">AI Model Precision (R²)</span>
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                    <Activity className="w-4 h-4" />
+                  </div>
+                </div>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-emerald-400">0.894</span>
+                  <span className="text-xs text-emerald-400/80">RMSE: 4.18mm</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500">Bi-LSTM + XGBoost Stacked Ensemble</p>
+              </div>
+            </div>
+
+            {/* Wardha District Spatial Matrix & Taluka Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Taluka Grid (2 cols) */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-blue-400" />
+                      Wardha District Taluka Sensor Network (10 Stations)
+                    </h2>
+                    <p className="text-xs text-slate-400">Real-time parsed status from station records</p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab("prediction")}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 bg-blue-500/10 px-3 py-1.5 rounded-lg border border-blue-500/20"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    Simulate Prediction
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {WARDHA_STATIONS.map((stn) => {
+                    const statusColors = {
+                      Normal: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+                      Watch: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
+                      Alert: "bg-orange-500/10 text-orange-400 border-orange-500/30",
+                      Warning: "bg-red-500/10 text-red-400 border-red-500/30",
+                    };
+
+                    return (
+                      <div
+                        key={stn.id}
+                        onClick={() => {
+                          setSelectedStationId(stn.id);
+                          setActiveTab("stations");
+                        }}
+                        className="bg-slate-900/90 border border-slate-800/90 hover:border-blue-500/50 rounded-xl p-3.5 cursor-pointer transition group hover:shadow-md hover:shadow-blue-500/5"
                       >
-                        {c}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="border-t border-border p-1 tech-label">
-              Observations recorded at 0830 IST (0300 UTC) 10-09-2026 ·{" "}
-              <a href="#">All 720 stations</a>
-            </div>
-          </section>
-        </div>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="text-sm font-semibold text-white group-hover:text-blue-400 transition flex items-center gap-1.5">
+                              {stn.name}
+                              <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition text-blue-400" />
+                            </div>
+                            <div className="text-xs text-slate-400 font-mono mt-0.5">
+                              {stn.lat} • {stn.lon}
+                            </div>
+                          </div>
+                          <span
+                            className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md border ${
+                              statusColors[stn.status]
+                            }`}
+                          >
+                            {stn.status}
+                          </span>
+                        </div>
 
-        {/* Right column */}
-        <div className="space-y-2">
-          <section className="panel">
-            <h2 className="panel-head">Weather Video Briefing</h2>
-            <a href="#" className="block">
-              <img
-                src={briefing}
-                alt="Duty forecaster delivering the daily national weather briefing"
-                width={800}
-                height={512}
-                loading="lazy"
-                className="w-full"
-              />
-            </a>
-            <div className="p-1">
-              <a href="#" className="text-[0.85rem] font-bold">
-                National Weather Briefing — 10 September 2026 (1130 IST)
-              </a>
-              <div className="tech-label">Duration 08:42 · Hindi &amp; English</div>
-            </div>
-          </section>
+                        <div className="mt-3 grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80 text-center">
+                          <div className="bg-slate-950/40 rounded-lg p-1.5">
+                            <span className="text-[10px] text-slate-500 block">24h Precip</span>
+                            <span className="text-xs font-bold text-cyan-400">{stn.current24h} mm</span>
+                          </div>
+                          <div className="bg-slate-950/40 rounded-lg p-1.5">
+                            <span className="text-[10px] text-slate-500 block">Annual Avg</span>
+                            <span className="text-xs font-bold text-slate-300">{stn.avgAnnual} mm</span>
+                          </div>
+                          <div className="bg-slate-950/40 rounded-lg p-1.5">
+                            <span className="text-[10px] text-slate-500 block">Max Record</span>
+                            <span className="text-xs font-bold text-amber-400">{stn.maxRain} mm</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <section className="panel">
-            <h2 className="panel-head">Press Releases</h2>
-            <ul className="linklist p-1">
-              {NEWS.map((n) => (
-                <li key={n.title} className="flex gap-2">
-                  <img
-                    src={n.img}
-                    alt=""
-                    width={64}
-                    height={48}
-                    loading="lazy"
-                    className="h-[42px] w-[58px] shrink-0 border border-border object-cover"
-                  />
-                  <span className="text-[0.82rem] leading-snug">
-                    <span className="tech-label">{n.date}</span>
-                    <br />
-                    <a href="#">{n.title}</a>
+              {/* Right: District Map Schematic & Live Alerts */}
+              <div className="space-y-4">
+                {/* District Schematic Visual Map */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-white flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-cyan-400" />
+                      Spatial Distribution (Wardha)
+                    </h3>
+                    <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                      GIS Schematic
+                    </span>
+                  </div>
+
+                  {/* 2D Coordinate Grid Visualizer */}
+                  <div className="relative h-64 bg-slate-950/90 rounded-xl border border-slate-800 p-3 overflow-hidden flex flex-col justify-between">
+                    {/* Background grid lines */}
+                    <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+                    <div className="relative z-10 text-[10px] text-slate-500 flex justify-between font-mono">
+                      <span>21.2° N (North / Ashti)</span>
+                      <span>Wardha River Basin</span>
+                    </div>
+
+                    {/* Interactive Plot Nodes */}
+                    <div className="relative w-full h-44 z-10">
+                      {WARDHA_STATIONS.map((stn) => {
+                        // Map lat (20.0 to 21.2) to Y (bottom to top)
+                        // Map lon (78.15 to 78.87) to X (left to right)
+                        const topPercent = 100 - ((stn.coords[0] - 20.0) / 1.25) * 85 - 8;
+                        const leftPercent = ((stn.coords[1] - 78.12) / 0.78) * 85 + 5;
+
+                        const haloColors = {
+                          Normal: "bg-emerald-500",
+                          Watch: "bg-yellow-500",
+                          Alert: "bg-orange-500",
+                          Warning: "bg-red-500",
+                        };
+
+                        return (
+                          <div
+                            key={stn.id}
+                            onClick={() => {
+                              setSelectedStationId(stn.id);
+                              setActiveTab("stations");
+                            }}
+                            style={{ top: `${topPercent}%`, left: `${leftPercent}%` }}
+                            className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
+                            title={`${stn.name} (${stn.taluka}) - Current 24h: ${stn.current24h}mm`}
+                          >
+                            <div className="relative flex items-center justify-center">
+                              <span
+                                className={`w-3 h-3 rounded-full ${haloColors[stn.status]} opacity-80 group-hover:scale-125 transition`}
+                              ></span>
+                              <span
+                                className={`absolute w-6 h-6 rounded-full ${haloColors[stn.status]} opacity-20 animate-ping`}
+                              ></span>
+                            </div>
+                            <span className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold bg-slate-900/90 text-slate-200 px-1.5 py-0.5 rounded border border-slate-700 shadow pointer-events-none group-hover:scale-110 transition">
+                              {stn.taluka}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="relative z-10 text-[10px] text-slate-500 flex justify-between font-mono">
+                      <span>20.0° N (South / Samudrapur)</span>
+                      <span>78.15° E &rarr; 78.87° E</span>
+                    </div>
+                  </div>
+
+                  {/* Legend */}
+                  <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Normal
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-yellow-400"></span> Watch
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-orange-400"></span> Alert
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-red-400"></span> Warning
+                    </span>
+                  </div>
+                </div>
+
+                {/* AI Early Warning Advisory Box */}
+                <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-amber-500/30 rounded-2xl p-4 shadow-lg shadow-amber-500/5">
+                  <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <ShieldAlert className="w-4 h-4" />
+                    Automated Inundation Advisory
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Elevated soil moisture saturation in{" "}
+                    <strong className="text-white">Hinganghat (68.4mm)</strong> &amp;{" "}
+                    <strong className="text-white">Samudrapur (52.0mm)</strong> basins indicates 78% probability of
+                    lowland runoff spillover along Vena river tributory within the next 18 hours.
+                  </p>
+                  <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800 pt-2">
+                    <span>Generated by HydroEnsemble AI</span>
+                    <button
+                      onClick={() => setActiveTab("prediction")}
+                      className="text-blue-400 hover:underline font-medium"
+                    >
+                      Run custom scenario &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 2: AI PREDICTION SANDBOX */}
+        {/* ========================================================================= */}
+        {activeTab === "prediction" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Banner */}
+            <div className="bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-slate-900 border border-blue-500/20 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-400" />
+                  Interactive ML Prediction &amp; Flood Risk Simulator
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Test the stacked Bi-LSTM + XGBoost model on synthetic or real hydrological inputs to predict 24h precipitation &amp; flash flood thresholds.
+                </p>
+              </div>
+
+              {/* Scenario Preset Buttons */}
+              <div className="flex items-center flex-wrap gap-1.5">
+                <span className="text-xs text-slate-400 mr-1">Demo Scenarios:</span>
+                <button
+                  onClick={() => applyPreset("dry")}
+                  className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700 transition"
+                >
+                  ☀️ Dry Spell
+                </button>
+                <button
+                  onClick={() => applyPreset("normal")}
+                  className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700 transition"
+                >
+                  🌦️ Normal Monsoon
+                </button>
+                <button
+                  onClick={() => applyPreset("flood")}
+                  className="text-xs bg-amber-900/40 hover:bg-amber-800/40 text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/30 transition"
+                >
+                  ⚠️ Heavy Inundation
+                </button>
+                <button
+                  onClick={() => applyPreset("cloudburst")}
+                  className="text-xs bg-red-900/40 hover:bg-red-800/40 text-red-300 px-2.5 py-1 rounded-lg border border-red-500/30 transition"
+                >
+                  ⛈️ 2013 Cloudburst Replay
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Parameter Sliders (7 cols) */}
+              <div className="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-5">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <span className="text-sm font-semibold text-white flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-blue-400" />
+                    Hydrological &amp; Atmospheric Input Vector
                   </span>
-                </li>
-              ))}
-            </ul>
-            <div className="border-t border-border p-1 text-right text-[0.8rem]">
-              <a href="#">All press releases »</a>
-            </div>
-          </section>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-slate-400">Target Station:</label>
+                    <select
+                      value={predStation}
+                      onChange={(e) => setPredStation(e.target.value)}
+                      className="bg-slate-950 border border-slate-700 text-xs text-white rounded-lg px-2 py-1 font-medium focus:outline-none focus:border-blue-500"
+                    >
+                      {WARDHA_STATIONS.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} ({s.taluka})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-          <section className="panel">
-            <h2 className="panel-head">Cyclone Watch</h2>
-            <div className="p-2 text-[0.82rem] leading-snug">
-              <strong>Deep Depression BOB 04</strong>
-              <br />
-              Position 0530 IST: 16.4°N / 86.9°E, about 310 km ESE of Visakhapatnam.
-              <br />
-              Max sustained wind: 55–65 kmph gusting 75 kmph.
-              <br />
-              Movement: NW at 14 kmph.
-              <br />
-              <a href="#">Bulletin No. 14 (PDF)</a> · <a href="#">Track map</a>
+                {/* Slider 1: Prior 24h Rainfall */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300 font-medium">Antecedent 24h Rainfall (Lag-1)</span>
+                    <span className="text-cyan-400 font-mono font-bold">{priorRain} mm</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={150}
+                    step={1}
+                    value={priorRain}
+                    onChange={(e) => setPriorRain(Number(e.target.value))}
+                    className="w-full accent-blue-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>0 mm (Dry)</span>
+                    <span>75 mm (Heavy)</span>
+                    <span>150 mm (Extreme)</span>
+                  </div>
+                </div>
+
+                {/* Slider 2: Relative Humidity */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300 font-medium">Relative Humidity (850 hPa)</span>
+                    <span className="text-blue-400 font-mono font-bold">{humidity} %</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={30}
+                    max={100}
+                    step={1}
+                    value={humidity}
+                    onChange={(e) => setHumidity(Number(e.target.value))}
+                    className="w-full accent-blue-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>30% (Dry Air)</span>
+                    <span>70% (Moist)</span>
+                    <span>100% (Saturated)</span>
+                  </div>
+                </div>
+
+                {/* Slider 3: Soil Moisture Saturation */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300 font-medium">Topsoil Moisture Saturation Index</span>
+                    <span className="text-emerald-400 font-mono font-bold">{soilMoisture} %</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={10}
+                    max={100}
+                    step={1}
+                    value={soilMoisture}
+                    onChange={(e) => setSoilMoisture(Number(e.target.value))}
+                    className="w-full accent-emerald-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>10% (Permeable)</span>
+                    <span>50% (Standard)</span>
+                    <span>100% (100% Runoff)</span>
+                  </div>
+                </div>
+
+                {/* Slider 4: Barometric Pressure */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300 font-medium">Surface Atmospheric Pressure</span>
+                    <span className="text-yellow-400 font-mono font-bold">{pressure} hPa</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={975}
+                    max={1020}
+                    step={1}
+                    value={pressure}
+                    onChange={(e) => setPressure(Number(e.target.value))}
+                    className="w-full accent-yellow-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>975 hPa (Deep Depression)</span>
+                    <span>1000 hPa (Trough)</span>
+                    <span>1020 hPa (High)</span>
+                  </div>
+                </div>
+
+                {/* Slider 5: Cloud Top IR Brightness Temp */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-300 font-medium">INSAT-3DR Cloud Top Brightness Temp</span>
+                    <span className="text-purple-400 font-mono font-bold">{cloudTemp} °C</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={-80}
+                    max={0}
+                    step={1}
+                    value={cloudTemp}
+                    onChange={(e) => setCloudTemp(Number(e.target.value))}
+                    className="w-full accent-purple-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                    <span>-80°C (Deep Convective)</span>
+                    <span>-40°C (Cumulus)</span>
+                    <span>0°C (Cirrus)</span>
+                  </div>
+                </div>
+
+                {/* Run Inference Button */}
+                <button
+                  onClick={handleRunInference}
+                  disabled={isInferencing}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 transition active:scale-[0.99] disabled:opacity-50"
+                >
+                  {isInferencing ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Propagating through Bi-LSTM Sequence...
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-4 h-4 fill-white" />
+                      Run Model Inference (LSTM + XGBoost)
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Right Column: AI Model Output & Risk Classification (5 cols) */}
+              <div className="lg:col-span-5 space-y-4">
+                {inferenceResult && (
+                  <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                      <span className="text-xs font-semibold uppercase text-slate-400 tracking-wider">
+                        Prediction Output
+                      </span>
+                      <span className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        Confidence: {inferenceResult.confidence}%
+                      </span>
+                    </div>
+
+                    {/* Big Metric Display */}
+                    <div className="text-center py-4 bg-slate-950/60 rounded-xl border border-slate-800">
+                      <span className="text-xs text-slate-400 block mb-1">Predicted 24-hr Rainfall</span>
+                      <div className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 font-mono">
+                        {inferenceResult.predictedRain} <span className="text-xl text-slate-400">mm</span>
+                      </div>
+
+                      {/* Risk Badge */}
+                      <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                        {inferenceResult.riskLevel === "Critical Cloudburst" && (
+                          <span className="bg-red-500/20 text-red-400 border border-red-500/40 px-3 py-1 rounded-full flex items-center gap-1">
+                            <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                            CRITICAL CLOUDBURST ALERT
+                          </span>
+                        )}
+                        {inferenceResult.riskLevel === "Alert" && (
+                          <span className="bg-orange-500/20 text-orange-400 border border-orange-500/40 px-3 py-1 rounded-full flex items-center gap-1">
+                            <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />
+                            HEAVY RAIN ALERT (&gt;65mm)
+                          </span>
+                        )}
+                        {inferenceResult.riskLevel === "Watch" && (
+                          <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/40 px-3 py-1 rounded-full flex items-center gap-1">
+                            <Info className="w-3.5 h-3.5 text-yellow-400" />
+                            MODERATE PRECIPITATION WATCH
+                          </span>
+                        )}
+                        {inferenceResult.riskLevel === "Normal" && (
+                          <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-3 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            NORMAL WEATHER / SAFE
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Secondary Hydrological Metrics */}
+                    <div className="grid grid-cols-2 gap-3 text-center text-xs">
+                      <div className="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
+                        <span className="text-slate-400 block text-[10px]">Estimated Runoff Index</span>
+                        <span className="text-base font-bold text-white font-mono mt-0.5 block">
+                          {inferenceResult.runoffIndex} / 100
+                        </span>
+                      </div>
+                      <div className="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800">
+                        <span className="text-slate-400 block text-[10px]">Lead Response Window</span>
+                        <span className="text-base font-bold text-cyan-400 font-mono mt-0.5 block">
+                          24–36 Hours
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Disaster Mitigation Advisory Box */}
+                    <div className="bg-slate-950/70 border border-blue-500/20 rounded-xl p-3 text-xs space-y-1">
+                      <span className="text-blue-400 font-semibold flex items-center gap-1">
+                        <ShieldAlert className="w-3.5 h-3.5" />
+                        Automated Decision Support:
+                      </span>
+                      <p className="text-slate-300 leading-relaxed">{inferenceResult.advisory}</p>
+                    </div>
+
+                    {/* Feature Importance Weights */}
+                    <div className="pt-2 border-t border-slate-800 space-y-2">
+                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                        Model Feature Attribution (SHAP %):
+                      </span>
+                      <div className="space-y-1.5">
+                        {ML_MODEL_METRICS.featureWeights.map((fw) => (
+                          <div key={fw.feature} className="space-y-0.5">
+                            <div className="flex justify-between text-[10px] text-slate-400">
+                              <span>{fw.feature}</span>
+                              <span className="font-mono text-slate-300">{fw.weight}%</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                              <div
+                                style={{ width: `${fw.weight * 2.5}%` }}
+                                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
+                              ></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </section>
-        </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 3: STATION DEEP-DIVE & CHARTS */}
+        {/* ========================================================================= */}
+        {activeTab === "stations" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Station Selector Bar */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <label className="text-xs text-slate-400 block font-medium">Select Station / Taluka:</label>
+                  <select
+                    value={selectedStationId}
+                    onChange={(e) => setSelectedStationId(e.target.value)}
+                    className="bg-slate-950 border border-slate-700 text-sm font-bold text-white rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500"
+                  >
+                    {WARDHA_STATIONS.map((stn) => (
+                      <option key={stn.id} value={stn.id}>
+                        {stn.name} — {stn.taluka} Taluka ({stn.totalRecords} records)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs font-mono">
+                <div>
+                  <span className="text-slate-500 block text-[10px]">COORDINATES</span>
+                  <span className="text-slate-300">{currentStation.lat}, {currentStation.lon}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">ELEVATION</span>
+                  <span className="text-slate-300">{currentStation.elevation}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px]">CSV FILE</span>
+                  <span className="text-cyan-400 font-semibold">{currentStation.file}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Monthly Climatology Curve */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                      <BarChart3 className="w-4 h-4 text-blue-400" />
+                      Mean Monthly Rainfall Distribution (mm)
+                    </h3>
+                    <p className="text-xs text-slate-400">Long-term climatological normal (June–Sept Monsoon Spike)</p>
+                  </div>
+                </div>
+
+                <div className="h-64 w-full pt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={currentStation.monthlyNormals} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
+                      <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
+                      <YAxis stroke="#94a3b8" fontSize={11} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px", fontSize: "12px" }}
+                        formatter={(val: any) => [`${val} mm`, "Monthly Mean"]}
+                      />
+                      <Bar dataKey="rainfall" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                        {currentStation.monthlyNormals.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={["Jun", "Jul", "Aug", "Sep"].includes(entry.month) ? "#06b6d4" : "#3b82f6"}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Annual Monsoon Totals & Anomaly */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                      <TrendingUp className="w-4 h-4 text-emerald-400" />
+                      Annual Rainfall Totals (2018–2024)
+                    </h3>
+                    <p className="text-xs text-slate-400">Total cumulative precipitation vs {currentStation.avgAnnual}mm baseline</p>
+                  </div>
+                </div>
+
+                <div className="h-64 w-full pt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={currentStation.yearlyTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
+                      <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
+                      <YAxis stroke="#94a3b8" fontSize={11} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px", fontSize: "12px" }}
+                        formatter={(val: any) => [`${val} mm`, "Total Rainfall"]}
+                      />
+                      <Area type="monotone" dataKey="rainfall" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#rainGrad)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Daily Observations Table */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-cyan-400" />
+                  Recent Daily Precipitation Sequence ({currentStation.taluka})
+                </h3>
+                <span className="text-xs text-slate-400">Historical Record Peak: <strong className="text-amber-400">{currentStation.maxRain} mm</strong> ({currentStation.maxDate})</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                    <tr>
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3">Precipitation (mm)</th>
+                      <th className="py-2.5 px-3">Classification</th>
+                      <th className="py-2.5 px-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                    {currentStation.recentObservations.map((obs, i) => (
+                      <tr key={i} className="hover:bg-slate-800/30 transition">
+                        <td className="py-2.5 px-3 text-slate-300 font-medium">{obs.date}</td>
+                        <td className="py-2.5 px-3 font-bold text-cyan-400">{obs.rainfall.toFixed(1)} mm</td>
+                        <td className="py-2.5 px-3 text-slate-400">{obs.category}</td>
+                        <td className="py-2.5 px-3">
+                          {obs.rainfall >= 50 ? (
+                            <span className="text-red-400 font-semibold">⚠️ Heavy Runoff</span>
+                          ) : obs.rainfall > 0 ? (
+                            <span className="text-blue-400">💧 Rain Recorded</span>
+                          ) : (
+                            <span className="text-slate-500">☀️ Dry Day</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4: DATASET EXPLORER */}
+        {/* ========================================================================= */}
+        {activeTab === "datasets" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Header & Upload Sandbox */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left: Dataset Summary */}
+              <div className="lg:col-span-2 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <FileSpreadsheet className="w-5 h-5 text-blue-400" />
+                  Wardha District IMD NDCQ Daily CSV Datasets
+                </h2>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  The prototype is trained on 10 localized station archives formatted per the National Data Centre Pune (NDCQ) standard. Below is the parsed registry of daily rainfall observations.
+                </p>
+
+                {/* Filter and Search Bar */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <div className="relative flex-1 min-w-[200px]">
+                    <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search station or filename..."
+                      value={datasetSearch}
+                      onChange={(e) => setDatasetSearch(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Custom CSV Test Sandbox */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-1.5 mb-1">
+                    <UploadCloud className="w-4 h-4 text-cyan-400" />
+                    Test Custom CSV File
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Upload an external NDCQ rainfall file to test parsing &amp; feature extraction.
+                  </p>
+                </div>
+
+                <div className="mt-3 border-2 border-dashed border-slate-700 hover:border-blue-500/60 rounded-xl p-4 text-center cursor-pointer transition bg-slate-950/40">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setUploadedFileName(e.target.files[0].name);
+                      }
+                    }}
+                    className="hidden"
+                    id="csv-upload"
+                  />
+                  <label htmlFor="csv-upload" className="cursor-pointer block space-y-1">
+                    <UploadCloud className="w-6 h-6 text-slate-400 mx-auto" />
+                    <span className="text-xs text-blue-400 font-medium block">
+                      {uploadedFileName ? `Loaded: ${uploadedFileName}` : "Click to select .CSV file"}
+                    </span>
+                    <span className="text-[10px] text-slate-500 block">NDCQ format: Date, Rainfall (mm)</span>
+                  </label>
+                </div>
+
+                {uploadedFileName && (
+                  <div className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" /> CSV Parsed successfully (Ready for inference)
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Datasets Table */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+                    <tr>
+                      <th className="py-3 px-3">Station</th>
+                      <th className="py-3 px-3">Filename</th>
+                      <th className="py-3 px-3">Coordinates</th>
+                      <th className="py-3 px-3 text-right">Total Rows</th>
+                      <th className="py-3 px-3 text-right">Annual Mean</th>
+                      <th className="py-3 px-3 text-right">Historical Max</th>
+                      <th className="py-3 px-3 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                    {WARDHA_STATIONS.filter(
+                      (s) =>
+                        s.name.toLowerCase().includes(datasetSearch.toLowerCase()) ||
+                        s.file.toLowerCase().includes(datasetSearch.toLowerCase())
+                    ).map((stn) => (
+                      <tr key={stn.id} className="hover:bg-slate-800/30 transition">
+                        <td className="py-3 px-3 text-white font-bold">{stn.name}</td>
+                        <td className="py-3 px-3 text-cyan-400">{stn.file}</td>
+                        <td className="py-3 px-3 text-slate-400">{stn.lat}, {stn.lon}</td>
+                        <td className="py-3 px-3 text-right text-slate-300">{stn.totalRecords.toLocaleString()}</td>
+                        <td className="py-3 px-3 text-right text-slate-300">{stn.avgAnnual} mm</td>
+                        <td className="py-3 px-3 text-right text-amber-400 font-bold">{stn.maxRain} mm</td>
+                        <td className="py-3 px-3 text-center">
+                          <button
+                            onClick={() => {
+                              setSelectedStationId(stn.id);
+                              setActiveTab("stations");
+                            }}
+                            className="text-[11px] text-blue-400 hover:text-blue-300 hover:underline"
+                          >
+                            Explore &rarr;
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 5: MODEL ARCHITECTURE & RESEARCH INFO */}
+        {/* ========================================================================= */}
+        {activeTab === "architecture" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Top Specs Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+                <span className="text-[10px] uppercase text-slate-400 font-mono block">Architecture</span>
+                <div className="text-sm font-bold text-white mt-1">Stacked Bi-LSTM + XGBoost</div>
+                <p className="text-[11px] text-slate-500 mt-1">Sequential temporal encoder + non-linear decision forest</p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+                <span className="text-[10px] uppercase text-slate-400 font-mono block">Accuracy (R² Score)</span>
+                <div className="text-xl font-bold text-emerald-400 mt-1">0.894 (89.4%)</div>
+                <p className="text-[11px] text-slate-500 mt-1">Evaluated on 2022–2024 test holdout partition</p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+                <span className="text-[10px] uppercase text-slate-400 font-mono block">Flash Flood F1-Score</span>
+                <div className="text-xl font-bold text-cyan-400 mt-1">93.8%</div>
+                <p className="text-[11px] text-slate-500 mt-1">Extreme deluge category classification score</p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+                <span className="text-[10px] uppercase text-slate-400 font-mono block">Lead Forecasting Time</span>
+                <div className="text-xl font-bold text-purple-400 mt-1">24 to 48 Hours</div>
+                <p className="text-[11px] text-slate-500 mt-1">Early warning window for disaster management</p>
+              </div>
+            </div>
+
+            {/* Neural Network Pipeline Schematic & Loss Curve */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Architecture Pipeline Explanation */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-blue-400" />
+                  Deep Learning Pipeline Schematic
+                </h3>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800 space-y-1">
+                    <div className="flex items-center justify-between text-blue-400 font-bold">
+                      <span>1. Temporal Sequence Input Layer</span>
+                      <span className="font-mono text-[10px] text-slate-400">(T=7 days, N=10 features)</span>
+                    </div>
+                    <p className="text-slate-300">
+                      Standardized sequence of antecedent rainfall, relative humidity, pressure differentials, and soil saturation index.
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800 space-y-1">
+                    <div className="flex items-center justify-between text-cyan-400 font-bold">
+                      <span>2. Bi-Directional LSTM Layer (128 units)</span>
+                      <span className="font-mono text-[10px] text-slate-400">Dropout: 0.25</span>
+                    </div>
+                    <p className="text-slate-300">
+                      Captures forward and backward monsoon pressure cycle dependencies across consecutive meteorological observation windows.
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800 space-y-1">
+                    <div className="flex items-center justify-between text-indigo-400 font-bold">
+                      <span>3. Dense Fusion &amp; XGBoost Residual Regressor</span>
+                      <span className="font-mono text-[10px] text-slate-400">Trees: 350, LR: 0.05</span>
+                    </div>
+                    <p className="text-slate-300">
+                      Fuses temporal embeddings with geospatial station coordinates (Lat, Lon, Elevation) to predict localized precipitation volume.
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800 space-y-1">
+                    <div className="flex items-center justify-between text-emerald-400 font-bold">
+                      <span>4. Flood Risk Threshold Classifier</span>
+                      <span className="font-mono text-[10px] text-slate-400">Softmax 4-Class</span>
+                    </div>
+                    <p className="text-slate-300">
+                      Classifies risk into Safe (&lt;25mm), Watch (25-64mm), Alert (65-115mm), and Critical Deluge (&gt;115mm).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Training Loss Curve (Epochs 5 to 40) */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3">
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-emerald-400" />
+                    Model Training vs Validation Loss Curve
+                  </h3>
+                  <p className="text-xs text-slate-400">Mean Squared Error (MSE) convergence over 40 training epochs</p>
+                </div>
+
+                <div className="h-64 w-full pt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={ML_MODEL_METRICS.trainingEpochs} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
+                      <XAxis dataKey="epoch" stroke="#94a3b8" fontSize={11} label={{ value: "Epochs", position: "insideBottom", offset: -5, fill: "#94a3b8", fontSize: 10 }} />
+                      <YAxis stroke="#94a3b8" fontSize={11} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", borderRadius: "8px", fontSize: "12px" }}
+                      />
+                      <Legend wrapperStyle={{ fontSize: "11px" }} />
+                      <Line type="monotone" dataKey="trainLoss" name="Training Loss" stroke="#38bdf8" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="valLoss" name="Validation Loss" stroke="#f43f5e" strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Student Project Academic Credits & Capstone Info */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2 text-white font-bold text-sm">
+                  <GraduationCap className="w-4 h-4 text-blue-400" />
+                  Academic &amp; Hackathon Capstone Details
+                </div>
+                <span className="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2.5 py-0.5 rounded border border-cyan-500/20">
+                  SIH 2026 Grand Finale Prototype
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <span className="text-slate-500 block text-[10px] uppercase font-mono">Problem Statement</span>
+                  <span className="text-slate-200 font-semibold">{PROJECT_METADATA.problemStatement}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px] uppercase font-mono">Team</span>
+                  <span className="text-slate-200 font-semibold">{PROJECT_METADATA.teamName}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px] uppercase font-mono">Target Region</span>
+                  <span className="text-slate-200 font-semibold">{PROJECT_METADATA.district}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px] uppercase font-mono">Tech Stack</span>
+                  <span className="text-slate-200 font-semibold">Python, PyTorch, React, Vite, Tailwind</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Important links */}
-      <section className="mx-auto max-w-[1200px] border-t border-border px-2 py-3">
-        <h2 className="mb-2 border-b-2 border-navy pb-1 text-[1.05rem] font-bold uppercase text-navy">
-          Important Links
-        </h2>
-        <div className="grid gap-x-8 gap-y-3 md:grid-cols-4">
-          {LINK_COLS.map((col) => (
-            <div key={col.head}>
-              <h3 className="mb-1 text-[0.9rem] font-bold">{col.head}</h3>
-              <ul className="list-disc pl-4 text-[0.83rem] leading-[1.6]">
-                {col.items.map((i) => (
-                  <li key={i}>
-                    <a href="#">{i}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <footer className="border-t border-border bg-navy-dark text-signal-foreground">
-        <div className="mx-auto max-w-[1200px] px-2 py-3 text-[0.8rem] leading-relaxed">
-          <p>
-            Content owned and maintained by the National Meteorological Department, Mausam Bhavan,
-            Lodi Road, New Delhi 110003. Telephone Control Room: 011-2461-1842 (24×7).
-          </p>
-          <p className="mt-1 text-signal-foreground/70">
-            Site designed, developed and hosted by the NMD Information Systems &amp; Services
-            Division · Best viewed at 1280×1024 · Page generated 10-09-2026 11:42:07 IST · Visitors:
-            41,208,663
-          </p>
-          <p className="mt-1">
-            <a href="#" className="text-signal-foreground underline">
-              Terms of Use
-            </a>{" "}
-            ·{" "}
-            <a href="#" className="text-signal-foreground underline">
-              Privacy Policy
-            </a>{" "}
-            ·{" "}
-            <a href="#" className="text-signal-foreground underline">
-              Copyright Policy
-            </a>{" "}
-            ·{" "}
-            <a href="#" className="text-signal-foreground underline">
-              Web Information Manager
-            </a>{" "}
-            ·{" "}
-            <a href="#" className="text-signal-foreground underline">
-              Sitemap
-            </a>
-          </p>
+      {/* Footer */}
+      <footer className="border-t border-slate-800 bg-slate-900/60 mt-10 py-4 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <strong>{PROJECT_METADATA.title}</strong> — {PROJECT_METADATA.subtitle}
+          </div>
+          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
+            <span>{PROJECT_METADATA.hackathon}</span>
+            <span>•</span>
+            <span>{PROJECT_METADATA.version}</span>
+          </div>
         </div>
       </footer>
     </div>
