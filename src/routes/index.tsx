@@ -193,7 +193,7 @@ function StudentPrototypeApp() {
   };
 
   return (
-    <div data-vatavaran-root className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white flex flex-col font-sans">
+    <div data-vatavaran-root data-theme={theme} className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white flex flex-col font-sans">
       {/* Top Banner */}
       <div data-vatavaran-banner className="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 border-b border-blue-900/30 px-4 py-1.5 text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext } from "react";
 
-type Theme = "dark" | "light";
+export type Theme = "dark" | "light";
 
 export const ThemeContext = createContext<{
   theme: Theme;
@@ -15,20 +15,18 @@ export function useTheme() {
 }
 
 export function useThemeProvider() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "dark";
-    return (localStorage.getItem("vatavaran-theme") as Theme) || "dark";
-  });
+  const [theme, setTheme] = useState<Theme>("dark");
 
+  // Read from localStorage only on client after mount
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "light") {
-      root.classList.remove("dark");
-      root.classList.add("light");
-    } else {
-      root.classList.remove("light");
-      root.classList.add("dark");
+    const saved = localStorage.getItem("vatavaran-theme") as Theme | null;
+    if (saved === "light" || saved === "dark") {
+      setTheme(saved);
     }
+  }, []);
+
+  // Persist choice to localStorage whenever it changes
+  useEffect(() => {
     localStorage.setItem("vatavaran-theme", theme);
   }, [theme]);
 

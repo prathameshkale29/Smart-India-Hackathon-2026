@@ -132,119 +132,122 @@
 
 /* ════════════════════════════════════════════
    LIGHT MODE — overrides for the dark-first UI
-   Applied when <html class="light"> is set
+   Applied when data-theme="light" is on wrapper div
    ════════════════════════════════════════════ */
-.light {
-  /* Page background */
-  --vatavaran-page-bg: #f1f5f9;
-  --vatavaran-header-bg: rgba(248, 250, 252, 0.95);
-  --vatavaran-card-bg: rgba(255, 255, 255, 0.95);
-  --vatavaran-card-bg-subtle: rgba(241, 245, 249, 0.9);
-  --vatavaran-border: rgba(203, 213, 225, 0.8);
-  --vatavaran-text-primary: #0f172a;
-  --vatavaran-text-secondary: #475569;
-  --vatavaran-text-muted: #64748b;
-}
 
-/* Page wrapper */
-.light [data-vatavaran-root] {
+/* Root wrapper itself */
+[data-theme="light"] {
   background-color: #f1f5f9 !important;
   color: #0f172a !important;
 }
 
 /* Top banner */
-.light [data-vatavaran-banner] {
+[data-theme="light"] [data-vatavaran-banner] {
   background: linear-gradient(to right, #dbeafe, #e0e7ff, #f1f5f9) !important;
   border-color: rgba(147, 197, 253, 0.5) !important;
 }
 
 /* Header */
-.light [data-vatavaran-header] {
+[data-theme="light"] [data-vatavaran-header] {
   background: rgba(248, 250, 252, 0.95) !important;
   border-color: rgba(203, 213, 225, 0.8) !important;
 }
 
 /* Nav tabs container */
-.light [data-vatavaran-nav] {
+[data-theme="light"] [data-vatavaran-nav] {
   background: rgba(226, 232, 240, 0.6) !important;
   border-color: rgba(203, 213, 225, 0.8) !important;
 }
 
 /* Inactive tab buttons */
-.light [data-vatavaran-nav] button {
+[data-theme="light"] [data-vatavaran-nav] button {
   color: #475569 !important;
 }
-.light [data-vatavaran-nav] button:hover {
+[data-theme="light"] [data-vatavaran-nav] button:hover {
   color: #0f172a !important;
   background: rgba(203, 213, 225, 0.5) !important;
 }
 
-/* Cards / panels with dark backgrounds */
-.light .bg-slate-900\/80,
-.light .bg-slate-900\/90,
-.light .bg-slate-900,
-.light .bg-slate-800 {
-  background-color: rgba(255,255,255,0.95) !important;
+/* Theme toggle button */
+[data-theme="light"] #theme-toggle-btn {
+  border-color: rgba(203, 213, 225, 0.8) !important;
+  background: rgba(241, 245, 249, 0.8) !important;
+  color: #475569 !important;
 }
 
-.light .bg-slate-950,
-.light .bg-slate-950\/40,
-.light .bg-slate-950\/60,
-.light .bg-slate-950\/70,
-.light .bg-slate-950\/80,
-.light .bg-slate-950\/90 {
-  background-color: rgba(241,245,249,0.9) !important;
+/* Cards / panels with dark slate backgrounds */
+[data-theme="light"] .bg-slate-900\/80,
+[data-theme="light"] .bg-slate-900\/90,
+[data-theme="light"] .bg-slate-900,
+[data-theme="light"] .bg-slate-800 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.7) !important;
 }
 
-.light .bg-slate-800\/30,
-.light .bg-slate-800\/50 {
-  background-color: rgba(226,232,240,0.5) !important;
+[data-theme="light"] .bg-slate-950,
+[data-theme="light"] .bg-slate-950\/40,
+[data-theme="light"] .bg-slate-950\/60,
+[data-theme="light"] .bg-slate-950\/70,
+[data-theme="light"] .bg-slate-950\/80,
+[data-theme="light"] .bg-slate-950\/90 {
+  background-color: rgba(241, 245, 249, 0.9) !important;
 }
 
-.light .bg-slate-700 {
+[data-theme="light"] .bg-slate-800\/30,
+[data-theme="light"] .bg-slate-800\/50 {
+  background-color: rgba(226, 232, 240, 0.5) !important;
+}
+
+[data-theme="light"] .bg-slate-700 {
   background-color: #cbd5e1 !important;
 }
 
 /* Borders */
-.light .border-slate-800,
-.light .border-slate-800\/80,
-.light .border-slate-800\/90 {
-  border-color: rgba(203,213,225,0.8) !important;
+[data-theme="light"] .border-slate-800,
+[data-theme="light"] .border-slate-800\/80,
+[data-theme="light"] .border-slate-800\/90 {
+  border-color: rgba(203, 213, 225, 0.8) !important;
 }
-.light .border-slate-700 {
-  border-color: rgba(148,163,184,0.7) !important;
+[data-theme="light"] .border-slate-700 {
+  border-color: rgba(148, 163, 184, 0.7) !important;
 }
 
 /* Text colors */
-.light .text-white {
+[data-theme="light"] .text-white {
   color: #0f172a !important;
 }
-.light .text-slate-100 {
+[data-theme="light"] .text-slate-100 {
   color: #1e293b !important;
 }
-.light .text-slate-200 {
+[data-theme="light"] .text-slate-200 {
   color: #334155 !important;
 }
-.light .text-slate-300 {
+[data-theme="light"] .text-slate-300 {
   color: #475569 !important;
 }
-.light .text-slate-400 {
+[data-theme="light"] .text-slate-400 {
   color: #64748b !important;
 }
-.light .text-slate-500 {
+[data-theme="light"] .text-slate-500 {
   color: #94a3b8 !important;
 }
 
-/* Gradient background in banner strip */
-.light .from-blue-950 {
+/* Gradient overrides */
+[data-theme="light"] .from-blue-950 {
   --tw-gradient-from: #dbeafe !important;
 }
-.light .via-indigo-950 {
+[data-theme="light"] .via-indigo-950 {
   --tw-gradient-via: #e0e7ff !important;
 }
-.light .to-slate-950 {
+[data-theme="light"] .to-slate-950 {
   --tw-gradient-to: #f1f5f9 !important;
 }
-.light .border-blue-900\/30 {
-  border-color: rgba(147,197,253,0.4) !important;
+[data-theme="light"] .border-blue-900\/30 {
+  border-color: rgba(147, 197, 253, 0.4) !important;
 }
+
+/* Main content area background */
+[data-theme="light"] main {
+  background-color: #f1f5f9;
+}
+
