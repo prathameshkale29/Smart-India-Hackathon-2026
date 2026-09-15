@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useMLPredictions } from "@/hooks/useMLPredictions";
+import { useTheme } from "@/hooks/useTheme";
 import {
   CloudRain,
   Droplets,
@@ -32,6 +33,8 @@ import {
   BrainCircuit,
   Wifi,
   WifiOff,
+  Moon,
+  Sun,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -67,6 +70,7 @@ function StudentPrototypeApp() {
 
   // Live ML Predictions from Jupyter notebook
   const { data: mlData, loading: mlLoading, error: mlError, modelReady, nextDayForecasts, riskSummary, forecastDates } = useMLPredictions();
+  const { theme, toggleTheme } = useTheme();
 
   // Predictor Simulator State
   const [predStation, setPredStation] = useState<string>("hinganghat");
@@ -189,9 +193,9 @@ function StudentPrototypeApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white flex flex-col font-sans">
+    <div data-vatavaran-root className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500 selection:text-white flex flex-col font-sans">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 border-b border-blue-900/30 px-4 py-1.5 text-xs">
+      <div data-vatavaran-banner className="bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 border-b border-blue-900/30 px-4 py-1.5 text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <span className="inline-flex items-center gap-1.5 rounded-md bg-blue-500/15 text-blue-300 font-semibold px-2.5 py-0.5 border border-blue-500/25">
             <GraduationCap className="w-3.5 h-3.5 text-blue-400" />
@@ -201,7 +205,7 @@ function StudentPrototypeApp() {
       </div>
 
       {/* Main App Header */}
-      <header className="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-40 backdrop-blur-md">
+      <header data-vatavaran-header className="border-b border-slate-800 bg-slate-900/90 sticky top-0 z-40 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -220,8 +224,18 @@ function StudentPrototypeApp() {
             </div>
           </div>
 
+          {/* Theme Toggle */}
+          <button
+            id="theme-toggle-btn"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            className="ml-2 p-2 rounded-lg border border-slate-700 bg-slate-800/60 text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
           {/* Tab Navigation */}
-          <nav className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto">
+          <nav data-vatavaran-nav className="flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto">
             <button
               onClick={() => setActiveTab("overview")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
