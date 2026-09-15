@@ -52,19 +52,19 @@ function StationsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Station Selector Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-2xs">
             <MapPin className="w-5 h-5" />
           </div>
           <div>
-            <label className="text-xs text-slate-400 block font-medium">
+            <label className="text-xs text-slate-500 block font-semibold uppercase tracking-wider">
               Select Station / Taluka:
             </label>
             <select
               value={selectedStationId}
               onChange={(e) => setSelectedStationId(e.target.value)}
-              className="bg-slate-950 border border-slate-700 text-sm font-bold text-white rounded-lg px-3 py-1 focus:outline-none focus:border-blue-500 cursor-pointer"
+              className="bg-slate-50 border border-slate-300 text-sm font-bold text-slate-900 rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500 cursor-pointer shadow-2xs mt-0.5"
             >
               {WARDHA_STATIONS.map((stn) => (
                 <option key={stn.id} value={stn.id}>
@@ -75,20 +75,20 @@ function StationsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-mono">
-          <div>
-            <span className="text-slate-500 block text-[10px]">COORDINATES</span>
-            <span className="text-slate-300">
+        <div className="flex items-center gap-5 text-xs font-mono">
+          <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px] font-sans font-semibold">COORDINATES</span>
+            <span className="text-slate-800 font-bold">
               {currentStation.lat}, {currentStation.lon}
             </span>
           </div>
-          <div>
-            <span className="text-slate-500 block text-[10px]">ELEVATION</span>
-            <span className="text-slate-300">{currentStation.elevation}</span>
+          <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px] font-sans font-semibold">ELEVATION</span>
+            <span className="text-slate-800 font-bold">{currentStation.elevation}</span>
           </div>
-          <div>
-            <span className="text-slate-500 block text-[10px]">CSV FILE</span>
-            <span className="text-cyan-400 font-semibold">{currentStation.file}</span>
+          <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+            <span className="text-slate-500 block text-[10px] font-sans font-semibold">NDCQ CSV FILE</span>
+            <span className="text-blue-700 font-bold">{currentStation.file}</span>
           </div>
         </div>
       </div>
@@ -96,14 +96,14 @@ function StationsPage() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Climatology Curve */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 space-y-3 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <BarChart3 className="w-4 h-4 text-blue-400" />
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <BarChart3 className="w-4 h-4 text-blue-600" />
                 Mean Monthly Rainfall Distribution (mm)
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Long-term climatological normal (June–Sept Monsoon Spike)
               </p>
             </div>
@@ -115,26 +115,28 @@ function StationsPage() {
                 data={currentStation.monthlyNormals}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
-                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.8} />
+                <XAxis dataKey="month" stroke="#64748b" fontSize={11} fontStyle="bold" />
+                <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#334155",
+                    backgroundColor: "#ffffff",
+                    borderColor: "#cbd5e1",
                     borderRadius: "8px",
                     fontSize: "12px",
+                    color: "#0f172a",
+                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
                   formatter={(val: any) => [`${val} mm`, "Monthly Mean"]}
                 />
-                <Bar dataKey="rainfall" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="rainfall" fill="#2563eb" radius={[4, 4, 0, 0]}>
                   {currentStation.monthlyNormals.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={
                         ["Jun", "Jul", "Aug", "Sep"].includes(entry.month)
-                          ? "#06b6d4"
-                          : "#3b82f6"
+                          ? "#0284c7"
+                          : "#2563eb"
                       }
                     />
                   ))}
@@ -145,14 +147,14 @@ function StationsPage() {
         </div>
 
         {/* Annual Monsoon Totals & Anomaly */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 space-y-3 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
                 Annual Rainfall Totals (2018–2024)
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Total cumulative precipitation vs {currentStation.avgAnnual}mm baseline
               </p>
             </div>
@@ -166,27 +168,29 @@ function StationsPage() {
               >
                 <defs>
                   <linearGradient id="rainGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
-                <XAxis dataKey="year" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.8} />
+                <XAxis dataKey="year" stroke="#64748b" fontSize={11} fontStyle="bold" />
+                <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#334155",
+                    backgroundColor: "#ffffff",
+                    borderColor: "#cbd5e1",
                     borderRadius: "8px",
                     fontSize: "12px",
+                    color: "#0f172a",
+                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
                   formatter={(val: any) => [`${val} mm`, "Total Rainfall"]}
                 />
                 <Area
                   type="monotone"
                   dataKey="rainfall"
-                  stroke="#10b981"
-                  strokeWidth={2}
+                  stroke="#059669"
+                  strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#rainGrad)"
                 />
@@ -197,44 +201,50 @@ function StationsPage() {
       </div>
 
       {/* Recent Daily Observations Table */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-cyan-400" />
+          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-blue-600" />
             Recent Daily Precipitation Sequence ({currentStation.taluka})
           </h3>
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-slate-600 font-medium">
             Historical Record Peak:{" "}
-            <strong className="text-amber-400">{currentStation.maxRain} mm</strong> (
+            <strong className="text-amber-700 font-bold">{currentStation.maxRain} mm</strong> (
             {currentStation.maxDate})
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+            <thead className="bg-slate-50 text-slate-600 uppercase font-mono text-[10px] border-b border-slate-200">
               <tr>
-                <th className="py-2.5 px-3">Date</th>
-                <th className="py-2.5 px-3">Precipitation (mm)</th>
-                <th className="py-2.5 px-3">Classification</th>
-                <th className="py-2.5 px-3">Status</th>
+                <th className="py-2.5 px-3 font-bold">Date</th>
+                <th className="py-2.5 px-3 font-bold">Precipitation (mm)</th>
+                <th className="py-2.5 px-3 font-bold">Classification</th>
+                <th className="py-2.5 px-3 font-bold">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono">
               {currentStation.recentObservations.map((obs, i) => (
-                <tr key={i} className="hover:bg-slate-800/30 transition">
-                  <td className="py-2.5 px-3 text-slate-300 font-medium">{obs.date}</td>
-                  <td className="py-2.5 px-3 font-bold text-cyan-400">
+                <tr key={i} className="hover:bg-slate-50/70 transition">
+                  <td className="py-2.5 px-3 text-slate-700 font-semibold">{obs.date}</td>
+                  <td className="py-2.5 px-3 font-extrabold text-blue-700">
                     {obs.rainfall.toFixed(1)} mm
                   </td>
-                  <td className="py-2.5 px-3 text-slate-400">{obs.category}</td>
+                  <td className="py-2.5 px-3 text-slate-600">{obs.category}</td>
                   <td className="py-2.5 px-3">
                     {obs.rainfall >= 50 ? (
-                      <span className="text-red-400 font-semibold">⚠️ Heavy Runoff</span>
+                      <span className="text-red-700 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                        ⚠️ Heavy Runoff
+                      </span>
                     ) : obs.rainfall > 0 ? (
-                      <span className="text-blue-400">💧 Rain Recorded</span>
+                      <span className="text-blue-700 font-semibold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                        💧 Rain Recorded
+                      </span>
                     ) : (
-                      <span className="text-slate-500">☀️ Dry Day</span>
+                      <span className="text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded">
+                        ☀️ Dry Day
+                      </span>
                     )}
                   </td>
                 </tr>

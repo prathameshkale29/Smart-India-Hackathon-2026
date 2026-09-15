@@ -8,7 +8,6 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { ThemeContext, useThemeProvider } from "../hooks/useTheme";
 import { AppLayout } from "@/components/AppLayout";
 
 import appCss from "../styles.css?url";
@@ -121,16 +120,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const themeValue = useThemeProvider();
 
   return (
-    <ThemeContext.Provider value={themeValue}>
-      <QueryClientProvider client={queryClient}>
-        {/* Render pages inside shared layout with navbar and theme */}
-        <AppLayout>
-          <Outlet />
-        </AppLayout>
-      </QueryClientProvider>
-    </ThemeContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    </QueryClientProvider>
   );
 }
