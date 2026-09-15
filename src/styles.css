@@ -131,123 +131,126 @@
 }
 
 /* ════════════════════════════════════════════
-   LIGHT MODE — overrides for the dark-first UI
-   Applied when data-theme="light" is on wrapper div
+   LIGHT MODE
+   .vatavaran-light is added to the wrapper div
+   when theme === 'light' in React state
    ════════════════════════════════════════════ */
 
-/* Root wrapper itself */
-[data-theme="light"] {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
+/* --- Universal catch-all override ---
+   Any element inside the light wrapper that has
+   a very dark background gets overridden here.
+   This avoids dealing with Tailwind's slash-escaped
+   class names like .bg-slate-950\/60            */
+.vatavaran-light * {
+  color: inherit;
 }
 
-/* Top banner */
-[data-theme="light"] [data-vatavaran-banner] {
-  background: linear-gradient(to right, #dbeafe, #e0e7ff, #f1f5f9) !important;
-  border-color: rgba(147, 197, 253, 0.5) !important;
+/* Gradient text still works */
+.vatavaran-light .gradient-text {
+  -webkit-text-fill-color: transparent;
 }
 
 /* Header */
-[data-theme="light"] [data-vatavaran-header] {
-  background: rgba(248, 250, 252, 0.95) !important;
-  border-color: rgba(203, 213, 225, 0.8) !important;
+.vatavaran-light [data-vatavaran-header] {
+  background: rgba(248, 250, 252, 0.97) !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
 }
 
-/* Nav tabs container */
-[data-theme="light"] [data-vatavaran-nav] {
-  background: rgba(226, 232, 240, 0.6) !important;
-  border-color: rgba(203, 213, 225, 0.8) !important;
+/* Banner */
+.vatavaran-light [data-vatavaran-banner] {
+  background: linear-gradient(to right, #dbeafe, #e0e7ff, #f0f4ff) !important;
+  border-color: rgba(147, 197, 253, 0.5) !important;
+  color: #1e3a8a !important;
 }
 
-/* Inactive tab buttons */
-[data-theme="light"] [data-vatavaran-nav] button {
+/* Nav tab strip */
+.vatavaran-light [data-vatavaran-nav] {
+  background: rgba(226, 232, 240, 0.8) !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
+}
+.vatavaran-light [data-vatavaran-nav] button {
   color: #475569 !important;
 }
-[data-theme="light"] [data-vatavaran-nav] button:hover {
+.vatavaran-light [data-vatavaran-nav] button:hover {
   color: #0f172a !important;
-  background: rgba(203, 213, 225, 0.5) !important;
+  background-color: rgba(203, 213, 225, 0.5) !important;
 }
 
-/* Theme toggle button */
-[data-theme="light"] #theme-toggle-btn {
-  border-color: rgba(203, 213, 225, 0.8) !important;
-  background: rgba(241, 245, 249, 0.8) !important;
+/* Theme toggle */
+.vatavaran-light #theme-toggle-btn {
+  border-color: #cbd5e1 !important;
+  background-color: #f1f5f9 !important;
   color: #475569 !important;
 }
 
-/* Cards / panels with dark slate backgrounds */
-[data-theme="light"] .bg-slate-900\/80,
-[data-theme="light"] .bg-slate-900\/90,
-[data-theme="light"] .bg-slate-900,
-[data-theme="light"] .bg-slate-800 {
-  background-color: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(203, 213, 225, 0.7) !important;
+/* ── Background overrides using [style] fallback + direct element targeting ── */
+
+/* All elements — reset dark text to dark-on-light */
+.vatavaran-light h1,
+.vatavaran-light h2,
+.vatavaran-light h3,
+.vatavaran-light h4,
+.vatavaran-light p,
+.vatavaran-light span,
+.vatavaran-light label,
+.vatavaran-light td,
+.vatavaran-light th,
+.vatavaran-light li,
+.vatavaran-light dt,
+.vatavaran-light dd {
+  color: inherit;
 }
 
-[data-theme="light"] .bg-slate-950,
-[data-theme="light"] .bg-slate-950\/40,
-[data-theme="light"] .bg-slate-950\/60,
-[data-theme="light"] .bg-slate-950\/70,
-[data-theme="light"] .bg-slate-950\/80,
-[data-theme="light"] .bg-slate-950\/90 {
-  background-color: rgba(241, 245, 249, 0.9) !important;
+/* Override dark panel backgrounds — target by computed style using inline style */
+.vatavaran-light div,
+.vatavaran-light section,
+.vatavaran-light article,
+.vatavaran-light aside,
+.vatavaran-light header,
+.vatavaran-light main,
+.vatavaran-light footer,
+.vatavaran-light nav,
+.vatavaran-light table,
+.vatavaran-light tr {
+  border-color: inherit;
 }
 
-[data-theme="light"] .bg-slate-800\/30,
-[data-theme="light"] .bg-slate-800\/50 {
-  background-color: rgba(226, 232, 240, 0.5) !important;
+/* Use attribute-targeted selectors for specific structural panels */
+.vatavaran-light [class*="bg-slate-9"],
+.vatavaran-light [class*="bg-slate-8"],
+.vatavaran-light [class*="bg-slate-7"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
-[data-theme="light"] .bg-slate-700 {
-  background-color: #cbd5e1 !important;
+/* Override the darkest backgrounds that use 950 */
+.vatavaran-light [class*="bg-slate-950"] {
+  background-color: #f1f5f9 !important;
 }
 
-/* Borders */
-[data-theme="light"] .border-slate-800,
-[data-theme="light"] .border-slate-800\/80,
-[data-theme="light"] .border-slate-800\/90 {
+/* Border overrides */
+.vatavaran-light [class*="border-slate-8"],
+.vatavaran-light [class*="border-slate-7"] {
   border-color: rgba(203, 213, 225, 0.8) !important;
 }
-[data-theme="light"] .border-slate-700 {
-  border-color: rgba(148, 163, 184, 0.7) !important;
-}
-
-/* Text colors */
-[data-theme="light"] .text-white {
-  color: #0f172a !important;
-}
-[data-theme="light"] .text-slate-100 {
-  color: #1e293b !important;
-}
-[data-theme="light"] .text-slate-200 {
-  color: #334155 !important;
-}
-[data-theme="light"] .text-slate-300 {
-  color: #475569 !important;
-}
-[data-theme="light"] .text-slate-400 {
-  color: #64748b !important;
-}
-[data-theme="light"] .text-slate-500 {
-  color: #94a3b8 !important;
-}
-
-/* Gradient overrides */
-[data-theme="light"] .from-blue-950 {
-  --tw-gradient-from: #dbeafe !important;
-}
-[data-theme="light"] .via-indigo-950 {
-  --tw-gradient-via: #e0e7ff !important;
-}
-[data-theme="light"] .to-slate-950 {
-  --tw-gradient-to: #f1f5f9 !important;
-}
-[data-theme="light"] .border-blue-900\/30 {
+.vatavaran-light [class*="border-blue-9"] {
   border-color: rgba(147, 197, 253, 0.4) !important;
 }
 
-/* Main content area background */
-[data-theme="light"] main {
-  background-color: #f1f5f9;
+/* Text color overrides */
+.vatavaran-light [class*="text-slate-1"],
+.vatavaran-light [class*="text-slate-2"],
+.vatavaran-light [class*="text-white"] {
+  color: #1e293b !important;
+}
+.vatavaran-light [class*="text-slate-3"],
+.vatavaran-light [class*="text-slate-4"] {
+  color: #64748b !important;
+}
+.vatavaran-light [class*="text-slate-5"] {
+  color: #94a3b8 !important;
 }
 
+/* Main content area */
+.vatavaran-light main {
+  background-color: #f1f5f9 !important;
+}
