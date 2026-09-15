@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { ThemeContext, useThemeProvider } from "../hooks/useTheme";
+import { AppLayout } from "@/components/AppLayout";
 
 import appCss from "../styles.css?url";
 
@@ -125,8 +126,10 @@ function RootComponent() {
   return (
     <ThemeContext.Provider value={themeValue}>
       <QueryClientProvider client={queryClient}>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
+        {/* Render pages inside shared layout with navbar and theme */}
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
       </QueryClientProvider>
     </ThemeContext.Provider>
   );

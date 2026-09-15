@@ -10,33 +10,102 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ArchitectureRouteImport } from './routes/architecture'
+import { Route as DatasetsRouteImport } from './routes/datasets'
+import { Route as MlResultsRouteImport } from './routes/ml-results'
+import { Route as PredictionRouteImport } from './routes/prediction'
+import { Route as StationsRouteImport } from './routes/stations'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArchitectureRoute = ArchitectureRouteImport.update({
+  id: '/architecture',
+  path: '/architecture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DatasetsRoute = DatasetsRouteImport.update({
+  id: '/datasets',
+  path: '/datasets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MlResultsRoute = MlResultsRouteImport.update({
+  id: '/ml-results',
+  path: '/ml-results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PredictionRoute = PredictionRouteImport.update({
+  id: '/prediction',
+  path: '/prediction',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StationsRoute = StationsRouteImport.update({
+  id: '/stations',
+  path: '/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/architecture': typeof ArchitectureRoute
+  '/datasets': typeof DatasetsRoute
+  '/ml-results': typeof MlResultsRoute
+  '/prediction': typeof PredictionRoute
+  '/stations': typeof StationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/architecture': typeof ArchitectureRoute
+  '/datasets': typeof DatasetsRoute
+  '/ml-results': typeof MlResultsRoute
+  '/prediction': typeof PredictionRoute
+  '/stations': typeof StationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/architecture': typeof ArchitectureRoute
+  '/datasets': typeof DatasetsRoute
+  '/ml-results': typeof MlResultsRoute
+  '/prediction': typeof PredictionRoute
+  '/stations': typeof StationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/architecture'
+    | '/datasets'
+    | '/ml-results'
+    | '/prediction'
+    | '/stations'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/architecture'
+    | '/datasets'
+    | '/ml-results'
+    | '/prediction'
+    | '/stations'
+  id:
+    | '__root__'
+    | '/'
+    | '/architecture'
+    | '/datasets'
+    | '/ml-results'
+    | '/prediction'
+    | '/stations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArchitectureRoute: typeof ArchitectureRoute
+  DatasetsRoute: typeof DatasetsRoute
+  MlResultsRoute: typeof MlResultsRoute
+  PredictionRoute: typeof PredictionRoute
+  StationsRoute: typeof StationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +117,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/architecture': {
+      id: '/architecture'
+      path: '/architecture'
+      fullPath: '/architecture'
+      preLoaderRoute: typeof ArchitectureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/datasets': {
+      id: '/datasets'
+      path: '/datasets'
+      fullPath: '/datasets'
+      preLoaderRoute: typeof DatasetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ml-results': {
+      id: '/ml-results'
+      path: '/ml-results'
+      fullPath: '/ml-results'
+      preLoaderRoute: typeof MlResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prediction': {
+      id: '/prediction'
+      path: '/prediction'
+      fullPath: '/prediction'
+      preLoaderRoute: typeof PredictionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stations': {
+      id: '/stations'
+      path: '/stations'
+      fullPath: '/stations'
+      preLoaderRoute: typeof StationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArchitectureRoute: ArchitectureRoute,
+  DatasetsRoute: DatasetsRoute,
+  MlResultsRoute: MlResultsRoute,
+  PredictionRoute: PredictionRoute,
+  StationsRoute: StationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
