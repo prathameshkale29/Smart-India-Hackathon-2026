@@ -94,6 +94,32 @@ function StudentPrototypeApp() {
   const [datasetSearch, setDatasetSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [csvPreviewRows, setCsvPreviewRows] = useState<string[][]>([]);
+  const [csvParseError, setCsvParseError] = useState<string | null>(null);
+
+  // Handle real CSV file parsing
+  const handleCsvUpload = (file: File) => {
+    setUploadedFileName(file.name);
+    setCsvPreviewRows([]);
+    setCsvParseError(null);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        // Find header row
+        const headerIdx = lines.findIndex(l => l.toUpperCase().includes('DATE'));
+        const startIdx = headerIdx >= 0 ? headerIdx : 0;
+        const rows = lines.slice(startIdx, startIdx + 11).map(l => l.split(',').map(c => c.trim()));
+        if (rows.length === 0) throw new Error('No parseable rows found');
+        setCsvPreviewRows(rows);
+      } catch (err: any) {
+        setCsvParseError(err.message || 'Could not parse CSV');
+      }
+    };
+    reader.onerror = () => setCsvParseError('Failed to read file');
+    reader.readAsText(file);
+  };
 
   // Selected station
   const currentStation = useMemo(() => {
@@ -1042,9 +1068,8 @@ function StudentPrototypeApp() {
                     type="file"
                     accept=".csv"
                     onChange={(e) => {
-                      if (e.target.files?.[0]) {
-                        setUploadedFileName(e.target.files[0].name);
-                      }
+                      const f = e.target.files?.[0];
+                      if (f) handleCsvUpload(f);
                     }}
                     className="hidden"
                     id="csv-upload"
@@ -1058,9 +1083,19 @@ function StudentPrototypeApp() {
                   </label>
                 </div>
 
-                {uploadedFileName && (
+                {uploadedFileName && !csvParseError && csvPreviewRows.length === 0 && (
                   <div className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5" /> CSV Parsed successfully (Ready for inference)
+                    <RefreshCw className="w-3 h-3 animate-spin" /> Parsing CSV...
+                  </div>
+                )}
+                {csvParseError && (
+                  <div className="mt-2 text-xs text-red-400 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" /> {csvParseError}
+                  </div>
+                )}
+                {csvPreviewRows.length > 0 && (
+                  <div className="mt-2 text-xs text-emerald-400 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" /> Parsed {csvPreviewRows.length - 1} rows — preview below
                   </div>
                 )}
               </div>
@@ -1111,6 +1146,53 @@ function StudentPrototypeApp() {
                 </table>
               </div>
             </div>
+
+            {/* CSV Preview Table */}
+            {csvPreviewRows.length > 0 && (
+              <div className="bg-slate-900/90 border border-emerald-500/20 rounded-2xl p-4">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                  CSV Preview — <span className="text-emerald-400 font-mono">{uploadedFileName}</span>
+                  <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded ml-auto">
+                    First {csvPreviewRows.length - 1} data rows
+                  </span>
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs font-mono">
+                    <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
+                      <tr>
+                        {(csvPreviewRows[0] || []).map((col, ci) => (
+                          <th key={ci} className="py-2 px-3 text-left">{col || `Col ${ci + 1}`}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/50">
+                      {csvPreviewRows.slice(1).map((row, ri) => (
+                        <tr key={ri} className="hover:bg-slate-800/30 transition">
+                          {row.map((cell, ci) => (
+                            <td key={ci} className="py-2 px-3 text-slate-300">{cell}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    onClick={() => { setUploadedFileName(null); setCsvPreviewRows([]); setCsvParseError(null); }}
+                    className="text-xs text-red-400 hover:text-red-300 border border-red-500/20 bg-red-500/10 px-3 py-1.5 rounded-lg transition"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("prediction")}
+                    className="text-xs text-blue-400 hover:text-blue-300 border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
+                  >
+                    <Sparkles className="w-3 h-3" /> Run AI Prediction on this data →
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1256,6 +1338,31 @@ function StudentPrototypeApp() {
                   <span className="text-slate-200 font-semibold">Python, PyTorch, React, Vite, Tailwind</span>
                 </div>
               </div>
+            </div>
+
+            {/* Quick Action Buttons */}
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://github.com/prathameshkale29/Smart-India-Hackathon-2026"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-xs bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl border border-slate-700 transition font-medium"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" /></svg>
+                View on GitHub
+              </a>
+              <button
+                onClick={() => setActiveTab("prediction")}
+                className="inline-flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl border border-blue-500 transition font-medium"
+              >
+                <Play className="w-3.5 h-3.5 fill-white" /> Try AI Prediction Sandbox
+              </button>
+              <button
+                onClick={() => setActiveTab("ml_results")}
+                className="inline-flex items-center gap-2 text-xs bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 px-4 py-2 rounded-xl border border-emerald-500/30 transition font-medium"
+              >
+                <BrainCircuit className="w-3.5 h-3.5" /> View Live ML Results
+              </button>
             </div>
           </div>
         )}
