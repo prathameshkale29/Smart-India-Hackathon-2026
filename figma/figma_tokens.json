@@ -1,0 +1,38 @@
+{
+  "version": "1.0.0",
+  "name": "VATAVARAN IMD Design System (SIH 2026)",
+  "global": {
+    "color": {
+      "gov-navy-dark": { "value": "#001a38", "type": "color" },
+      "gov-navy-primary": { "value": "#002855", "type": "color" },
+      "gov-navy-hover": { "value": "#003875", "type": "color" },
+      "gov-blue-accent": { "value": "#004b99", "type": "color" },
+      "gov-cyan-live": { "value": "#38bdf8", "type": "color" },
+      "surface-canvas": { "value": "#f4f6f9", "type": "color" },
+      "surface-card": { "value": "#ffffff", "type": "color" },
+      "surface-subtle": { "value": "#f8fafc", "type": "color" },
+      "border-default": { "value": "#cbd5e1", "type": "color" },
+      "text-primary": { "value": "#0f172a", "type": "color" },
+      "text-secondary": { "value": "#475569", "type": "color" },
+      "imd-green-bg": { "value": "#ecfdf5", "type": "color" },
+      "imd-green-text": { "value": "#065f46", "type": "color" },
+      "imd-yellow-bg": { "value": "#fefce8", "type": "color" },
+      "imd-yellow-text": { "value": "#854d0e", "type": "color" },
+      "imd-orange-bg": { "value": "#fff7ed", "type": "color" },
+      "imd-orange-text": { "value": "#9a3412", "type": "color" },
+      "imd-red-bg": { "value": "#fef2f2", "type": "color" },
+      "imd-red-text": { "value": "#991b1b", "type": "color" }
+    },
+    "fontFamilies": {
+      "heading": { "value": "Inter", "type": "fontFamilies" },
+      "body": { "value": "Inter", "type": "fontFamilies" },
+      "mono": { "value": "Roboto Mono", "type": "fontFamilies" }
+    },
+    "borderRadius": {
+      "sm": { "value": "4px", "type": "borderRadius" },
+      "md": { "value": "8px", "type": "borderRadius" },
+      "lg": { "value": "12px", "type": "borderRadius" },
+      "xl": { "value": "16px", "type": "borderRadius" }
+    }
+  }
+}

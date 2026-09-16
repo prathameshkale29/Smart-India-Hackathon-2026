@@ -8,6 +8,8 @@ import {
   AlertTriangle,
   Check,
   Sparkles,
+  Database,
+  Building,
 } from "lucide-react";
 import { WARDHA_STATIONS } from "@/data/wardhaData";
 
@@ -46,49 +48,54 @@ function DatasetsPage() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header & Upload Sandbox */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Dataset Summary */}
-        <div className="lg:col-span-2 bg-white border border-slate-200/90 rounded-2xl p-5 space-y-3 shadow-sm">
-          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-blue-600" />
-            Wardha District IMD NDCQ Daily CSV Datasets
-          </h2>
+    <div className="space-y-5 animate-in fade-in duration-300">
+      {/* Registry Masthead & CSV Sandbox */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Left: NDC Pune Registry Dossier */}
+        <div className="lg:col-span-2 bg-white border-2 border-[#002855] rounded-xl p-4.5 space-y-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <Building className="w-5 h-5 text-[#002855]" />
+            <div>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                IMD Meteorological Data Repository
+              </span>
+              <h2 className="text-base font-extrabold text-[#002855]">
+                National Data Centre (NDC Pune) Daily NDCQ Meteorological Archives
+              </h2>
+            </div>
+          </div>
           <p className="text-xs text-slate-600 leading-relaxed font-medium">
-            The prototype is trained on 10 localized station archives formatted per the
-            National Data Centre Pune (NDCQ) standard. Below is the parsed registry of
-            daily rainfall observations.
+            This repository contains standardized daily rainfall telemetry records from 10 automatic stations in Wardha District (2010–2024), parsed in compliance with the IMD National Data Centre Pune NDCQ climatological standard.
           </p>
 
-          {/* Filter and Search Bar */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          {/* Search Filter */}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search station or filename..."
+                placeholder="Search by Station Name, Taluka, or NDCQ File..."
                 value={datasetSearch}
                 onChange={(e) => setDatasetSearch(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 font-medium shadow-2xs"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-700"
               />
             </div>
           </div>
         </div>
 
-        {/* Right: Custom CSV Test Sandbox */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+        {/* Right: Custom NDCQ CSV Validation Sandbox */}
+        <div className="bg-white border-2 border-[#002855] rounded-xl p-4.5 flex flex-col justify-between shadow-xs">
           <div>
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 mb-1">
-              <UploadCloud className="w-4 h-4 text-blue-600" />
-              Test Custom CSV File
+            <h3 className="text-xs font-bold text-[#002855] uppercase flex items-center gap-1.5 mb-1">
+              <UploadCloud className="w-4 h-4 text-blue-700" />
+              External NDCQ CSV File Validation Sandbox
             </h3>
-            <p className="text-xs text-slate-500 font-medium">
-              Upload an external NDCQ rainfall file to test parsing &amp; feature extraction.
+            <p className="text-[11px] text-slate-500 font-medium">
+              Upload external daily rainfall CSV records to parse and extract antecedent moisture features.
             </p>
           </div>
 
-          <div className="mt-3 border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-4 text-center cursor-pointer transition bg-slate-50/70">
+          <div className="mt-2.5 border-2 border-dashed border-slate-300 hover:border-blue-700 rounded-lg p-3 text-center cursor-pointer transition bg-slate-50">
             <input
               type="file"
               accept=".csv"
@@ -100,80 +107,88 @@ function DatasetsPage() {
               id="csv-upload"
             />
             <label htmlFor="csv-upload" className="cursor-pointer block space-y-1">
-              <UploadCloud className="w-6 h-6 text-slate-400 mx-auto" />
-              <span className="text-xs text-blue-700 font-bold block">
-                {uploadedFileName
-                  ? `Loaded: ${uploadedFileName}`
-                  : "Click to select .CSV file"}
+              <UploadCloud className="w-5 h-5 text-[#002855] mx-auto" />
+              <span className="text-xs text-[#002855] font-bold block">
+                {uploadedFileName ? `Loaded: ${uploadedFileName}` : "Click to select .CSV file"}
               </span>
               <span className="text-[10px] text-slate-500 block">
-                NDCQ format: Date, Rainfall (mm)
+                Standard format: Date, Rainfall (mm)
               </span>
             </label>
           </div>
 
           {uploadedFileName && !csvParseError && csvPreviewRows.length === 0 && (
-            <div className="mt-2 text-xs text-emerald-700 font-semibold flex items-center gap-1">
-              <RefreshCw className="w-3 h-3 animate-spin text-emerald-600" /> Parsing CSV...
+            <div className="mt-2 text-xs text-blue-800 font-bold flex items-center gap-1">
+              <RefreshCw className="w-3 h-3 animate-spin text-blue-700" /> Parsing NDCQ format...
             </div>
           )}
           {csvParseError && (
-            <div className="mt-2 text-xs text-red-700 bg-red-50 p-2 rounded-lg border border-red-200 flex items-center gap-1">
+            <div className="mt-2 text-xs text-red-800 bg-red-50 p-2 rounded border border-red-200 flex items-center gap-1 font-bold">
               <AlertTriangle className="w-3 h-3 text-red-600" /> {csvParseError}
             </div>
           )}
           {csvPreviewRows.length > 0 && (
-            <div className="mt-2 text-xs text-emerald-800 font-bold flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-              <Check className="w-3.5 h-3.5 text-emerald-600" /> Parsed {csvPreviewRows.length - 1} rows
-              — preview below
+            <div className="mt-2 text-xs text-emerald-900 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-1 rounded border border-emerald-300">
+              <Check className="w-3.5 h-3.5 text-emerald-700" /> Successfully parsed {csvPreviewRows.length - 1} rows
             </div>
           )}
         </div>
       </div>
 
-      {/* Datasets Table */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm">
+      {/* Official NDCQ Dataset Registry Table */}
+      <div className="bg-white border border-slate-300 rounded-xl p-4 shadow-xs">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
+          <span className="text-xs font-bold text-[#002855] uppercase">
+            IMD Pune Quality-Controlled Daily Rainfall Archives (10 Stations)
+          </span>
+          <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+            QC FLAG: LEVEL-1 AUDITED
+          </span>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-600 uppercase font-mono text-[10px] border-b border-slate-200">
+          <table className="w-full text-xs text-left border border-slate-200 font-mono">
+            <thead className="bg-[#002855] text-white uppercase text-[10px] font-bold">
               <tr>
-                <th className="py-3 px-3 font-bold">Station</th>
-                <th className="py-3 px-3 font-bold">Filename</th>
-                <th className="py-3 px-3 font-bold">Coordinates</th>
-                <th className="py-3 px-3 text-right font-bold">Total Rows</th>
-                <th className="py-3 px-3 text-right font-bold">Annual Mean</th>
-                <th className="py-3 px-3 text-right font-bold">Historical Max</th>
-                <th className="py-3 px-3 text-center font-bold">Action</th>
+                <th className="py-2.5 px-3">Station Name</th>
+                <th className="py-2.5 px-3">NDCQ Archive Filename</th>
+                <th className="py-2.5 px-3">Grid Coordinates</th>
+                <th className="py-2.5 px-3 text-right">Observation Rows</th>
+                <th className="py-2.5 px-3 text-right">Annual Mean</th>
+                <th className="py-2.5 px-3 text-right">Record Deluge</th>
+                <th className="py-2.5 px-3 text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-mono">
+            <tbody className="divide-y divide-slate-200">
               {WARDHA_STATIONS.filter(
                 (s) =>
                   s.name.toLowerCase().includes(datasetSearch.toLowerCase()) ||
                   s.file.toLowerCase().includes(datasetSearch.toLowerCase())
               ).map((stn) => (
-                <tr key={stn.id} className="hover:bg-slate-50/70 transition">
-                  <td className="py-3 px-3 text-slate-900 font-bold">{stn.name}</td>
-                  <td className="py-3 px-3 text-blue-700 font-semibold">{stn.file}</td>
-                  <td className="py-3 px-3 text-slate-600 font-medium">
-                    {stn.lat}, {stn.lon}
+                <tr key={stn.id} className="hover:bg-slate-50 transition">
+                  <td className="py-2.5 px-3 text-slate-900 font-bold font-sans">
+                    {stn.name} <span className="text-[10px] text-slate-500 font-normal">({stn.taluka})</span>
                   </td>
-                  <td className="py-3 px-3 text-right text-slate-800 font-medium">
+                  <td className="py-2.5 px-3 text-blue-800 font-bold">{stn.file}</td>
+                  <td className="py-2.5 px-3 text-slate-600">
+                    {stn.lat}° N, {stn.lon}° E
+                  </td>
+                  <td className="py-2.5 px-3 text-right text-slate-900 font-bold">
                     {stn.totalRecords.toLocaleString()}
                   </td>
-                  <td className="py-3 px-3 text-right text-slate-800 font-medium">
+                  <td className="py-2.5 px-3 text-right text-slate-700">
                     {stn.avgAnnual} mm
                   </td>
-                  <td className="py-3 px-3 text-right text-amber-700 font-extrabold">
+                  <td className="py-2.5 px-3 text-right text-amber-800 font-black">
                     {stn.maxRain} mm
                   </td>
-                  <td className="py-3 px-3 text-center">
+                  <td className="py-2.5 px-3 text-center font-sans">
                     <Link
                       to="/stations"
                       search={{ station: stn.id }}
-                      className="text-[11px] text-blue-700 hover:text-blue-900 font-bold hover:underline"
+                      className="text-[11px] font-bold text-blue-700 hover:text-blue-900 hover:underline"
                     >
-                      Explore &rarr;
+                      Dossier &rarr;
                     </Link>
                   </td>
                 </tr>
@@ -185,31 +200,33 @@ function DatasetsPage() {
 
       {/* CSV Preview Table */}
       {csvPreviewRows.length > 0 && (
-        <div className="bg-white border border-emerald-300 rounded-2xl p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3">
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            CSV Preview —{" "}
-            <span className="text-emerald-700 font-mono font-bold">{uploadedFileName}</span>
-            <span className="text-[10px] text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 ml-auto font-medium">
-              First {csvPreviewRows.length - 1} data rows
+        <div className="bg-white border-2 border-emerald-600 rounded-xl p-4 shadow-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
+            <h3 className="text-xs font-bold text-[#002855] uppercase flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4 text-emerald-700" />
+              Parsed NDCQ Preview — <span className="text-emerald-800 font-mono">{uploadedFileName}</span>
+            </h3>
+            <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-mono">
+              Sample: First {csvPreviewRows.length - 1} records
             </span>
-          </h3>
+          </div>
+
           <div className="overflow-x-auto">
-            <table className="w-full text-xs font-mono">
-              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+            <table className="w-full text-xs font-mono border border-slate-200">
+              <thead className="bg-[#002855] text-white border-b border-slate-300">
                 <tr>
                   {(csvPreviewRows[0] || []).map((col, ci) => (
-                    <th key={ci} className="py-2.5 px-3 text-left font-bold">
+                    <th key={ci} className="py-2 px-3 text-left font-bold text-[10px]">
                       {col || `Col ${ci + 1}`}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-200">
                 {csvPreviewRows.slice(1).map((row, ri) => (
-                  <tr key={ri} className="hover:bg-slate-50/70 transition">
+                  <tr key={ri} className="hover:bg-slate-50 transition">
                     {row.map((cell, ci) => (
-                      <td key={ci} className="py-2 px-3 text-slate-800">
+                      <td key={ci} className="py-2 px-3 text-slate-800 font-medium">
                         {cell}
                       </td>
                     ))}
@@ -218,22 +235,23 @@ function DatasetsPage() {
               </tbody>
             </table>
           </div>
-          <div className="mt-3.5 flex items-center gap-2">
+
+          <div className="mt-3 flex items-center gap-2">
             <button
               onClick={() => {
                 setUploadedFileName(null);
                 setCsvPreviewRows([]);
                 setCsvParseError(null);
               }}
-              className="text-xs text-red-700 hover:text-red-800 font-semibold border border-red-200 bg-red-50 px-3 py-1.5 rounded-lg transition cursor-pointer"
+              className="text-xs text-red-800 font-bold border border-red-300 bg-red-50 px-3 py-1.5 rounded transition cursor-pointer"
             >
-              Clear
+              Clear Buffer
             </button>
             <Link
               to="/prediction"
-              className="text-xs text-blue-700 hover:text-blue-800 font-bold border border-blue-200 bg-blue-50 px-3.5 py-1.5 rounded-lg transition flex items-center gap-1 hover:bg-blue-100 shadow-2xs"
+              className="text-xs text-white font-bold bg-[#002855] hover:bg-[#003875] px-3.5 py-1.5 rounded transition flex items-center gap-1 shadow-2xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Run AI Prediction on this data →
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Run AI Prediction on this data →
             </Link>
           </div>
         </div>

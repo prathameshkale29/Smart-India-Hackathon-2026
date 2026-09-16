@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 960" width="1440" height="960" style="background:#f4f6f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="tricolor" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff9933" />
+      <stop offset="33.3%" stop-color="#ff9933" />
+      <stop offset="33.3%" stop-color="#ffffff" />
+      <stop offset="66.6%" stop-color="#ffffff" />
+      <stop offset="66.6%" stop-color="#138808" />
+      <stop offset="100%" stop-color="#138808" />
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#002855" />
+      <stop offset="100%" stop-color="#004b99" />
+    </linearGradient>
+  </defs>
+
+  <!-- Tricolor Bar -->
+  <rect x="0" y="0" width="1440" height="4" fill="url(#tricolor)" />
+
+  <!-- Top Masthead -->
+  <rect x="0" y="4" width="1440" height="32" fill="#001a38" />
+  <text x="64" y="24" fill="#ffffff" font-size="11" font-weight="bold">भारत सरकार | Government of India</text>
+  <text x="250" y="24" fill="#94a3b8" font-size="11">|</text>
+  <text x="265" y="24" fill="#e2e8f0" font-size="11">पृथ्वी विज्ञान मंत्रालय | Ministry of Earth Sciences</text>
+  <text x="545" y="24" fill="#94a3b8" font-size="11">|</text>
+  <text x="560" y="24" fill="#38bdf8" font-size="11" font-weight="bold">भारत मौसम विज्ञान विभाग | India Meteorological Department</text>
+  <rect x="1230" y="10" width="146" height="20" rx="4" fill="#002855" stroke="#004080" />
+  <text x="1245" y="24" fill="#fde047" font-size="10" font-family="monospace" font-weight="bold">SIH 2026 CAPSTONE</text>
+
+  <!-- Main Header -->
+  <rect x="0" y="36" width="1440" height="74" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+  <rect x="64" y="49" width="48" height="48" rx="8" fill="url(#logoGrad)" stroke="#003875" />
+  <text x="80" y="80" fill="#38bdf8" font-size="22" font-weight="bold">🌧</text>
+  
+  <text x="124" y="68" fill="#002855" font-size="18" font-weight="900" letter-spacing="1">VATAVARAN</text>
+  <rect x="250" y="55" width="85" height="16" rx="3" fill="#002855" />
+  <text x="256" y="67" fill="#ffffff" font-size="9" font-weight="bold">IMD-SIH PROTO</text>
+  <text x="124" y="86" fill="#475569" font-size="11" font-weight="600">Wardha District High-Resolution Precipitation &amp; Inundation AI Platform</text>
+  <text x="124" y="100" fill="#94a3b8" font-size="10">Developed by Team Vatavaran • Smart India Hackathon 2026 Prototype</text>
+
+  <!-- Bulletin Marquee Bar -->
+  <rect x="0" y="110" width="1440" height="28" fill="#fff8e1" stroke="#ffe082" stroke-width="1" />
+  <rect x="64" y="114" width="145" height="20" rx="3" fill="#fef3c7" stroke="#f59e0b" />
+  <text x="74" y="128" fill="#78350f" font-size="10" font-weight="bold">🔴 IMD WEATHER BULLETIN</text>
+  <text x="220" y="128" fill="#1e293b" font-size="11" font-weight="500">DISTRICT WARNING: Isolated heavy deluge alert active for Hinganghat &amp; Samudrapur basins along Vena tributary.</text>
+
+  <!-- Navigation Bar -->
+  <rect x="0" y="138" width="1440" height="40" fill="#002855" />
+  <!-- Tab 1 Active -->
+  <rect x="64" y="138" width="200" height="40" fill="#001a38" />
+  <line x1="64" y1="177" x2="264" y2="177" stroke="#f59e0b" stroke-width="3" />
+  <text x="80" y="162" fill="#ffffff" font-size="11" font-weight="bold">📊 Overview &amp; Talukas</text>
+  <!-- Other Tabs -->
+  <text x="284" y="162" fill="#cbd5e1" font-size="11" font-weight="600">🎛️ QPF &amp; Flood Simulator</text>
+  <text x="474" y="162" fill="#cbd5e1" font-size="11" font-weight="600">📈 Station Telemetry</text>
+  <text x="634" y="162" fill="#cbd5e1" font-size="11" font-weight="600">📁 NDC Pune Datasets</text>
+  <text x="794" y="162" fill="#cbd5e1" font-size="11" font-weight="600">🧠 Neural Architecture</text>
+  <text x="964" y="162" fill="#cbd5e1" font-size="11" font-weight="600">⚡ Live Panchayat Forecasts</text>
+
+  <!-- 5-Day Warning Matrix Container -->
+  <rect x="64" y="196" width="1312" height="110" rx="8" fill="#ffffff" stroke="#002855" stroke-width="2" />
+  <text x="80" y="218" fill="#002855" font-size="12" font-weight="bold">🔴 IMD 5-DAY DISTRICT HYDROMETEOROLOGICAL WARNING MATRIX — WARDHA (044)</text>
+  
+  <!-- 5 Cards -->
+  <rect x="80" y="230" width="245" height="64" rx="6" fill="#fff7ed" stroke="#fdba74" />
+  <text x="90" y="246" fill="#9a3412" font-size="10" font-weight="bold">DAY 1 (TODAY) — 15-SEP</text>
+  <rect x="90" y="252" width="225" height="18" rx="3" fill="#f97316" />
+  <text x="175" y="265" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">ALERT (ORANGE)</text>
+  <text x="90" y="284" fill="#475569" font-size="9">Heavy rain at isolated places</text>
+
+  <rect x="340" y="230" width="245" height="64" rx="6" fill="#fff7ed" stroke="#fdba74" />
+  <text x="350" y="246" fill="#9a3412" font-size="10" font-weight="bold">DAY 2 — 16-SEP</text>
+  <rect x="350" y="252" width="225" height="18" rx="3" fill="#f97316" />
+  <text x="435" y="265" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">ALERT (ORANGE)</text>
+  <text x="350" y="284" fill="#475569" font-size="9">Moderate to heavy showers</text>
+
+  <rect x="600" y="230" width="245" height="64" rx="6" fill="#fefce8" stroke="#fde047" />
+  <text x="610" y="246" fill="#854d0e" font-size="10" font-weight="bold">DAY 3 — 17-SEP</text>
+  <rect x="610" y="252" width="225" height="18" rx="3" fill="#eab308" />
+  <text x="695" y="265" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle">WATCH (YELLOW)</text>
+  <text x="610" y="284" fill="#475569" font-size="9">Scattered moderate rain</text>
+
+  <rect x="860" y="230" width="245" height="64" rx="6" fill="#ecfdf5" stroke="#a7f3d0" />
+  <text x="870" y="246" fill="#065f46" font-size="10" font-weight="bold">DAY 4 — 18-SEP</text>
+  <rect x="870" y="252" width="225" height="18" rx="3" fill="#10b981" />
+  <text x="955" y="265" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">NO WARNING (GREEN)</text>
+  <text x="870" y="284" fill="#475569" font-size="9">Light rain / cloudy</text>
+
+  <rect x="1120" y="230" width="245" height="64" rx="6" fill="#ecfdf5" stroke="#a7f3d0" />
+  <text x="1130" y="246" fill="#065f46" font-size="10" font-weight="bold">DAY 5 — 19-SEP</text>
+  <rect x="1130" y="252" width="225" height="18" rx="3" fill="#10b981" />
+  <text x="1215" y="265" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">NO WARNING (GREEN)</text>
+  <text x="1130" y="284" fill="#475569" font-size="9">Trace to light rain</text>
+
+  <!-- 4 Stats Cards -->
+  <rect x="64" y="320" width="315" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="80" y="342" fill="#475569" font-size="11" font-weight="bold">TOTAL NDCQ RECORDS</text>
+  <text x="80" y="375" fill="#002855" font-size="28" font-family="monospace" font-weight="bold">33,680</text>
+  <text x="80" y="396" fill="#64748b" font-size="10">Daily IMD Pune Records (2010–2024)</text>
+
+  <rect x="396" y="320" width="315" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="412" y="342" fill="#475569" font-size="11" font-weight="bold">ANNUAL LPA NORMAL</text>
+  <text x="412" y="375" fill="#0f172a" font-size="28" font-family="monospace" font-weight="bold">1,128.4 <tspan font-size="16" fill="#64748b">mm</tspan></text>
+  <text x="412" y="396" fill="#64748b" font-size="10">Monsoon dominance: 88.5% (Jun–Sep)</text>
+
+  <rect x="728" y="320" width="315" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="744" y="342" fill="#475569" font-size="11" font-weight="bold">HISTORICAL PEAK DELUGE</text>
+  <text x="744" y="375" fill="#c2410c" font-size="28" font-family="monospace" font-weight="bold">256.0 <tspan font-size="16" fill="#64748b">mm</tspan></text>
+  <text x="744" y="396" fill="#64748b" font-size="10">Cloudburst event on 18-07-2013</text>
+
+  <rect x="1060" y="320" width="315" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="1076" y="342" fill="#475569" font-size="11" font-weight="bold">AI ENSEMBLE PRECISION (R²)</text>
+  <text x="1076" y="375" fill="#047857" font-size="28" font-family="monospace" font-weight="bold">0.894</text>
+  <text x="1076" y="396" fill="#64748b" font-size="10">Bi-LSTM + XGBoost (RMSE: 4.18mm)</text>
+
+  <!-- Table & Radar Grid -->
+  <rect x="64" y="425" width="760" height="420" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="84" y="452" fill="#002855" font-size="13" font-weight="bold">WARDHA DISTRICT TELEMETRY MATRIX (10 STATIONS)</text>
+  <rect x="84" y="465" width="720" height="28" fill="#002855" rx="3" />
+  <text x="96" y="483" fill="#ffffff" font-size="10" font-weight="bold">TALUKA / STATION</text>
+  <text x="260" y="483" fill="#ffffff" font-size="10" font-weight="bold">COORDINATES</text>
+  <text x="440" y="483" fill="#ffffff" font-size="10" font-weight="bold">24H PRECIP</text>
+  <text x="560" y="483" fill="#ffffff" font-size="10" font-weight="bold">IMD STATUS</text>
+  <text x="710" y="483" fill="#ffffff" font-size="10" font-weight="bold">ACTION</text>
+
+  <!-- Table Rows -->
+  <line x1="84" y1="525" x2="804" y2="525" stroke="#e2e8f0" />
+  <text x="96" y="515" fill="#002855" font-size="11" font-weight="bold">Arvi (Wardha)</text>
+  <text x="260" y="515" fill="#64748b" font-size="10" font-family="monospace">20.98° N, 78.23° E</text>
+  <text x="440" y="515" fill="#002855" font-size="11" font-weight="bold">18.4 mm</text>
+  <rect x="560" y="503" width="60" height="16" rx="3" fill="#ecfdf5" stroke="#a7f3d0" />
+  <text x="590" y="515" fill="#065f46" font-size="9" font-weight="bold" text-anchor="middle">NORMAL</text>
+  <text x="710" y="515" fill="#0284c7" font-size="11" font-weight="bold">Dossier →</text>
+
+  <line x1="84" y1="560" x2="804" y2="560" stroke="#e2e8f0" />
+  <text x="96" y="550" fill="#002855" font-size="11" font-weight="bold">Hinganghat</text>
+  <text x="260" y="550" fill="#64748b" font-size="10" font-family="monospace">20.55° N, 78.83° E</text>
+  <text x="440" y="550" fill="#c2410c" font-size="11" font-weight="bold">68.4 mm</text>
+  <rect x="560" y="538" width="60" height="16" rx="3" fill="#fff7ed" stroke="#fdba74" />
+  <text x="590" y="550" fill="#9a3412" font-size="9" font-weight="bold" text-anchor="middle">ALERT</text>
+  <text x="710" y="550" fill="#0284c7" font-size="11" font-weight="bold">Dossier →</text>
+
+  <!-- Right Radar Box -->
+  <rect x="840" y="425" width="536" height="420" rx="8" fill="#ffffff" stroke="#cbd5e1" />
+  <text x="860" y="452" fill="#002855" font-size="13" font-weight="bold">WARDHA RIVER BASIN GIS RADAR GRID</text>
+  <rect x="860" y="465" width="496" height="230" rx="6" fill="#001a38" stroke="#002855" stroke-width="2" />
+  <text x="875" y="490" fill="#38bdf8" font-size="11" font-family="monospace" font-weight="bold">21.2° N (Ashti)</text>
+  <text x="875" y="680" fill="#38bdf8" font-size="11" font-family="monospace" font-weight="bold">20.0° N (Samudrapur)</text>
+  
+  <circle cx="1100" cy="550" r="8" fill="#f97316" />
+  <circle cx="1100" cy="550" r="16" fill="none" stroke="#f97316" opacity="0.4" />
+  <text x="1100" y="575" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">Hinganghat (68.4mm)</text>
+
+  <!-- Advisory Box -->
+  <rect x="860" y="705" width="496" height="125" rx="6" fill="#fff7ed" stroke="#f97316" stroke-width="2" />
+  <text x="875" y="728" fill="#7c2d12" font-size="12" font-weight="bold">⚠️ HYDROLOGICAL INUNDATION ADVISORY (VENA BASIN)</text>
+  <text x="875" y="750" fill="#431407" font-size="11">Elevated soil moisture in Hinganghat (68.4mm) &amp; Samudrapur indicates 78% flood probability.</text>
+  <text x="875" y="775" fill="#002855" font-size="11" font-weight="bold">Lead Time: 24 to 36 Hours • Action: Deploy Drainage Pumps</text>
+</svg>
